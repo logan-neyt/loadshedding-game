@@ -1,0 +1,11 @@
+body {
+  background: black;
+}
+
+canvas {
+  background: white;
+  width: 100%;
+  max-width: 480px;
+  margin: auto;
+  display: block;
+}
