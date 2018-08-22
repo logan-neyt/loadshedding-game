@@ -12,6 +12,21 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
 
+function game(){
+  /*
+    Object to track and update the game's state.
+  */
+  this.time = 0;  // The time of day in the game.
+  this.day = 0;   // How many in game days have elapsed.
+  this.weather = 0; // The in game weather state.
+  this.power = 0; // How much power is being used.
+
+  this.update = function (){
+
+  };
+}
+var gameState = new game(); // Create a new game() object.
+
 function Office(xPos, yPos){
   /*
     Object to handle an office building. Write once and reuse.
@@ -52,6 +67,7 @@ var office2 = new Office(100, 20);
 
 var loop = kontra.gameLoop({  // Create the kontra endless game loop.
   update: function(){
+    gameState.update();
     office1.update();
     office2.update();
   },
