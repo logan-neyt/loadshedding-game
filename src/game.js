@@ -1,17 +1,22 @@
-kontra.init();
+kontra.init();  // Initilize the kontra library.
 
 var drawingScale = 5; // Distance between grid references used in drawing. Int.
 
-function getRandomInt(max) {  // Syntactic sugar for generating random integers.
+function getRandomInt(max) {
+  /*
+    Syntactic sugar for generating random integers.
+   */
   return Math.floor(Math.random() * Math.floor(max));
 }
 
-
-
 function officeRender(context, color, powerConsumption) {
-  // context: The context object that will be used to draw the sprite.
-  // color: The main color of the sprite.
-  // powerConsumption: Amount of power this building is consuming. Int 0-20.
+  /*
+    Function to draw an office building sprite. Write once and reuse.
+    context: The context object that will be used to draw the sprite.
+    color: The main color of the sprite.
+    powerConsumption: Amount of power this building is consuming. Int 0-20.
+   */
+
   // Draw walls.
   this.context.fillStyle(this.color);
   this.context.fillRect(this.x, this.y, 13 * drawingScale, 12 * drawingScale);
@@ -32,7 +37,6 @@ function officeRender(context, color, powerConsumption) {
   this.context.fillRect(this.x + (5 * drawingScale), this.y + (8 * drawingScale), 3 * drawingScale, 4 * drawingScale);
 };
 
-//var office = kontra.sprite({
 var office = kontra.sprite({
   x: 10,
   y: 10,
@@ -42,9 +46,7 @@ var office = kontra.sprite({
   render: officeRender(this.context, this.color, this.powerConsumption)
 });
 
-var office1 = office(10, 10)
-
-var loop = kontra.gameLoop({
+var loop = kontra.gameLoop({  // Create the kontra endless game loop.
   update: function(){
     office1.update();
   },
@@ -53,4 +55,4 @@ var loop = kontra.gameLoop({
   }
 });
 
-loop.start(); // Start kontra endless game loop.
+loop.start(); // Start game loop.
