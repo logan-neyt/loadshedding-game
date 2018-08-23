@@ -27,6 +27,43 @@ function game(){
 }
 var gameState = new game(); // Create a new game() object.
 
+function House(xPos, yPos){
+  /*
+    Object to handle an house building. Write once and reuse.
+  */
+  this.context = context; // The context object to use for drawing.
+  this.x = xPos;  // X coordinate of the sprite.
+  this.y = yPos;  // Y coordinate of the sprite.
+  this.color = "grey";  // Primary color of the sprite.
+  this.color2 = "blue"; // Secondary color of the sprite.
+  this.consumption = 0;  // Amount of power the building is consuming.
+
+  this.update = function (){  // Update the state of the object.
+
+  };
+  this.render = function (){  // Render the sprite.
+    // Draw chimney.
+    this.context.fillStyle = this.color;
+    this.context.fillRect(this.x + drawingScale, this.y, drawingScale, 2 * drawingScale);
+    // Draw roof.
+    this.context.fillStyle = this.color2;
+    this.context.beginPath();
+    this.context.moveTo(this.x, this.y + (2 * drawingScale));
+    this.context.lineTo(this.x + (4 * drawingScale), this.y);
+    this.context.lineTo(this.x + (8 * drawingScale), this.y + (2 * drawingScale));
+    this.context.fill();
+    // Draw walls.
+    this.context.fillStyle = this.color;
+    this.context.fillRect(this.x, this.y + (2 * drawingScale), 8 * drawingScale, 4 * drawingScale);
+    // Draw window.
+    this.context.fillStyle = "black";
+    this.context.fillRect(this.x + drawingScale, this.y + (3 * drawingScale), 2 * drawingScale, 2 * drawingScale);
+    // Draw door.
+    this.context.fillStyle = "black";
+    this.context.fillRect(this.x + (5 * drawingScale), this.y + (3 * drawingScale), 2 * drawingScale, 3 * drawingScale);
+  };
+};
+
 function Office(xPos, yPos){
   /*
     Object to handle an office building. Write once and reuse.
@@ -64,16 +101,19 @@ function Office(xPos, yPos){
 
 var office1 = new Office(20, 20);
 var office2 = new Office(100, 20);
+var house1 = new House(20, 100);
 
 var loop = kontra.gameLoop({  // Create the kontra endless game loop.
   update: function(){
     gameState.update();
     office1.update();
     office2.update();
+    house1.update();
   },
   render: function() {
     office1.render();
     office2.render();
+    house1.render();
   }
 });
 
