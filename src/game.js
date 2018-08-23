@@ -1,14 +1,13 @@
 kontra.init();  // Initilize the kontra library.
 
-var canvas = document.querySelector("canvas");
-var context = canvas.getContext("2d");
+var context = document.querySelector("canvas").getContext("2d");  // Create the context used for drawing.
 
 var drawingScale = 5; // Distance between grid references used in drawing. Int.
 
 function getRandomInt(max) {
   /*
     Syntactic sugar for generating random integers.
-   */
+  */
   return Math.floor(Math.random() * Math.floor(max));
 }
 
@@ -24,7 +23,7 @@ function game(){
   this.update = function (){
 
   };
-}
+};
 var gameState = new game(); // Create a new game() object.
 
 function House(xPos, yPos){
@@ -67,7 +66,7 @@ function House(xPos, yPos){
 function Office(xPos, yPos){
   /*
     Object to handle an office building. Write once and reuse.
-   */
+  */
   this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
@@ -77,7 +76,7 @@ function Office(xPos, yPos){
   this.update = function (){  // Update the state of the object.
 
   };
-  this.render = function r(){  // Render the sprite.
+  this.render = function (){  // Render the sprite.
     // Draw walls.
     this.context.fillStyle = this.color;
     this.context.fillRect(this.x, this.y, 13 * drawingScale, 12 * drawingScale);
