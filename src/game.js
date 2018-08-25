@@ -15,14 +15,48 @@ function game(){
   /*
     Object to track and update the game's state.
   */
-  this.time = 0;  // The time of day in the game.
+  this.context = context; // The context object to use for drawing.
+  this.color = "blue";  // The primary color used in the GUI.
+
+  this.time = 9000;  // The time of day in the game.
   this.day = 0;   // How many in game days have elapsed.
   this.weather = 0; // The in game weather state.
   this.power = 0; // How much power is being used.
 
-  this.update = function (){
+  this.friendlyTime = function(){ // Return the game time in a 24 hour format.
+    this.hours = Math.round(this.time / 750);
+    if(this.hours < 10){  // If the hours are fewer than 10 then add a leading zero.
+      this.hours = "0" + this.hours;
+    }
+    this.mins = Math.round(this.time / 12.5) % 60;
+    if(this.mins < 10){  // If the mins are fewer than 10 then add a leading zero.
+      this.mins = "0" + this.mins;
+    }
+    return this.hours + ":" + this.mins;
+  }
 
+  this.update = function (){  // Update the game's state.
+    // Update the in game time and day.
+    this.time++;
+    if(this.time >= 18000){  // If it is the next day.
+      this.day++;
+      this.time = this.time - 18000;
+    }
   };
+  this.gui = function (){  // Render the game's GUI.
+    // Clock and date.
+    context.fillStyle = this.color;
+    context.beginPath();
+    context.moveTo(canvasWidth, 8 * drawingScale);
+    context.lineTo(canvasWidth - (60 * drawingScale), 8 * drawingScale);
+    context.lineTo(canvasWidth - (64 * drawingScale), 4 * drawingScale);
+    context.lineTo(canvasWidth - (64 * drawingScale), 0);
+    context.lineTo(canvasWidth, 0);
+    context.fill();
+    context.font = Math.round(6 * drawingScale) + "px Nova Flat";
+    context.fillStyle = "white";
+    context.fillText(this.friendlyTime() + "  Day " + this.day, canvasWidth - (54 * drawingScale), 6 * drawingScale);
+  }
 };
 var gameState = new game(); // Create a new game() object.
 
@@ -113,6 +147,7 @@ var loop = kontra.gameLoop({  // Create the kontra endless game loop.
     office1.render();
     office2.render();
     house1.render();
+    gameState.gui();
   }
 });
 
