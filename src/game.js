@@ -2,6 +2,9 @@ kontra.init();  // Initilize the kontra library.
 
 var canvas = document.querySelector("canvas");  // Find the canvas that we will be using.
 var context = canvas.getContext("2d");  // Create the context used for drawing.
+var canvasHeight; // The height of the canvas.
+var canvasWidth; // The width of the canvas.
+var drawingScale; // Distance between grid references used in drawing.
 resizeCanvas()
 
 function resizeCanvas(){
@@ -15,9 +18,9 @@ function resizeCanvas(){
     canvas.height = window.innerHeight;
     canvas.width = window.innerHeight * 2;
   };
-  var canvasHeight = canvas.height; // Get the height of the canvas.
-  var canvasWidth = canvas.width; // Get the width of the canvas.
-  var drawingScale = canvasWidth / 512; // Distance between grid references used in drawing.
+  canvasHeight = canvas.height; // Set the height of the canvas.
+  canvasWidth = canvas.width; // Set the width of the canvas.
+  drawingScale = canvasWidth / 512; // Set the distance between grid references.
 }
 
 function getRandomInt(max) {
