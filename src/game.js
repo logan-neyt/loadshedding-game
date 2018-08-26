@@ -1,17 +1,24 @@
 kontra.init();  // Initilize the kontra library.
 
 var canvas = document.querySelector("canvas");  // Find the canvas that we will be using.
-if (window.innerWidth > window.innerHeight / 2){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerWidth / 2;
-} else {
-  canvas.height = window.innerHeight;
-  canvas.width = window.innerHeight * 2;
-};
 var context = canvas.getContext("2d");  // Create the context used for drawing.
-var canvasHeight = canvas.height; // Get the height of the canvas.
-var canvasWidth = canvas.width; // Get the width of the canvas.
-var drawingScale = canvasWidth / 256; // Distance between grid references used in drawing.
+resizeCanvas()
+
+function resizeCanvas(){
+  /*
+    Set the size of the canvas to maintain a constant aspect ratio.
+   */
+  if (window.innerWidth > window.innerHeight / 2){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerWidth / 2;
+  } else {
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerHeight * 2;
+  };
+  var canvasHeight = canvas.height; // Get the height of the canvas.
+  var canvasWidth = canvas.width; // Get the width of the canvas.
+  var drawingScale = canvasWidth / 512; // Distance between grid references used in drawing.
+}
 
 function getRandomInt(max) {
   /*
