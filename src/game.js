@@ -59,6 +59,10 @@ function game(){
       this.time = this.time - 18000;
     }
   };
+  this.backLayer = function (){ // Render the background for the map.
+    context.fillStyle = "green";
+    context.fillRect(0, 0, canvasWidth, canvasHeight);
+  };
   this.gui = function (){  // Render the game's GUI.
     // Clock and date.
     context.fillStyle = this.color;
@@ -148,21 +152,23 @@ function Office(xPos, yPos){
 };
 
 var gameState = new game(); // Create a new game() object.
-var office1 = new Office(20, 20);
-var office2 = new Office(100, 20);
-var house1 = new House(20, 100);
+var buildings = [new Office(20, 20),  // Create an array with all the buildings in it.
+                 new Office(100, 20),
+                 new House(20, 100)]
+var buildingsLength = buildings.length;
 
 var loop = kontra.gameLoop({  // Create the kontra endless game loop.
   update: function(){
     gameState.update();
-    office1.update();
-    office2.update();
-    house1.update();
+    for (var i = 0; i < buildingsLength; i++){  // Update all the buildings in the array.
+      buildings[i].update();
+    }
   },
   render: function() {
-    office1.render();
-    office2.render();
-    house1.render();
+    gameState.backLayer();
+    for (var i = 0; i < buildingsLength; i++){  // Render all the building sprites.
+      buildings[i].render();
+    }
     gameState.gui();
   }
 });
