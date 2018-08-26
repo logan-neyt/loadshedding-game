@@ -38,7 +38,7 @@ function game(){
   this.color = "blue";  // The primary color used in the GUI.
 
   this.time = 9000;  // The time of day in the game.
-  this.day = 0;   // How many in game days have elapsed.
+  this.day = 1;   // How many in game days have elapsed.
   this.weather = 0; // The in game weather state.
   this.power = 0; // How much power is being used.
 
@@ -155,9 +155,11 @@ function Office(xPos, yPos){
 };
 
 var gameState = new game(); // Create a new game() object.
-var buildings = [new Office(20, 20),  // Create an array with all the buildings in it.
-                 new Office(100, 20),
-                 new House(20, 100)]
+var buildings = [new Office(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
+                 new Office(105 * drawingScale, 25  * drawingScale),
+                 new House(80  * drawingScale, 50 * drawingScale),
+                 new House(92.5  * drawingScale, 50 * drawingScale),
+                 new House(105  * drawingScale, 50 * drawingScale)]
 var buildingsLength = buildings.length;
 
 var loop = kontra.gameLoop({  // Create the kontra endless game loop.
