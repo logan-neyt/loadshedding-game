@@ -1,8 +1,17 @@
 kontra.init();  // Initilize the kontra library.
 
-var context = document.querySelector("canvas").getContext("2d");  // Create the context used for drawing.
-
-var drawingScale = 5; // Distance between grid references used in drawing. Int.
+var canvas = document.querySelector("canvas");  // Find the canvas that we will be using.
+if (window.innerWidth > window.innerHeight / 2){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerWidth / 2;
+} else {
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerHeight * 2;
+};
+var context = canvas.getContext("2d");  // Create the context used for drawing.
+var canvasHeight = canvas.height; // Get the height of the canvas.
+var canvasWidth = canvas.width; // Get the width of the canvas.
+var drawingScale = canvasWidth / 256; // Distance between grid references used in drawing.
 
 function getRandomInt(max) {
   /*
@@ -58,7 +67,6 @@ function game(){
     context.fillText(this.friendlyTime() + "  Day " + this.day, canvasWidth - (54 * drawingScale), 6 * drawingScale);
   }
 };
-var gameState = new game(); // Create a new game() object.
 
 function House(xPos, yPos){
   /*
@@ -132,6 +140,7 @@ function Office(xPos, yPos){
   };
 };
 
+var gameState = new game(); // Create a new game() object.
 var office1 = new Office(20, 20);
 var office2 = new Office(100, 20);
 var house1 = new House(20, 100);
