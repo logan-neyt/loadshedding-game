@@ -30,6 +30,11 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
 
+function endGame(day, time){
+  /*
+    Display the end game screen.
+  */
+}
 function game(){
   /*
     Object to track and update the game's state.
@@ -40,7 +45,10 @@ function game(){
   this.time = 9000;  // The time of day in the game.
   this.day = 1;   // How many in game days have elapsed.
   this.weather = 0; // The in game weather state.
-  this.power = 0; // How much power is being used.
+  this.weatherDelay = 0;  // How many cycles before the weather changes. Stops the weather from changing every cycle.
+  this.powerGenerated = 0; // How much power is being generated.
+  this.powerConsumed = 10; // How much power is being consumed.
+  this.gridFail = 300;  // Counts down to fail if the amount of power being consumend exceded the power being generated.
 
   this.friendlyTime = function(){ // Return the game time in a 24 hour format.
     this.hours = Math.round(this.time / 750);
@@ -54,12 +62,28 @@ function game(){
     return this.hours + ":" + this.mins;
   }
 
+  this.generate = function(power){ // Add to the powerGenerated tally.
+    this.powerGenerated = this.powerGenerated + power;
+  }
+  this.consume = function(power){  // Add to the powerConsumed tally.
+    this.powerConsumed = this.powerConsumed + power;
+  }
+
   this.update = function (){  // Update the game's state.
     // Update the in game time and day.
     this.time++;
     if(this.time >= 18000){  // If it is the next day.
       this.day++;
       this.time = this.time - 18000;
+    }
+    // Check that the amount of power being consumend does not excede the power being generated.
+    if (this.powerGenerated < this.powerConsumed){
+      if (this.gridFail <= 0){  // Test for end game condition.
+        endGame(this.day, this.time);
+      }
+      this.gridFail--;  // Continue the countdown.
+    } else {  // If the grid is fine
+      this.gridFail = 300;  // Reset the count down.
     }
   };
   this.backLayer = function (){ // Render the background for the map.
