@@ -190,15 +190,121 @@ function Office(xPos, yPos){
     this.context.restore();
   };
 };
+
+function WindTurbine(xPos, yPos){
+  /*
+    Object to handle a wind turbine. Write once and reuse.
+  */
+  this.context = context; // The context object to use for drawing.
+  this.x = xPos;  // X coordinate of the sprite.
+  this.y = yPos;  // Y coordinate of the sprite.
+  this.color = "grey";  // Primary color of the sprite.
+  this.color2 = "darkgrey"; // Secondary color of the sprite.
+  this.frame = getRandomInt(8) * 15; // The animation frame the sprite is currently in.
+  this.generation = 0;  // Amount of power the building is generating.
+
+  this.update = function(){
+    // Increment the animation.
+    this.frame++;
+    if(this.frame >= 120){
+      this.frame = 0;
+    };
+  };
+  this.render = function(){
+    // Move the coordinate system.
+    this.context.save();
+    this.context.translate(this.x, this.y);
+    // Draw base.
+    this.context.fillStyle = this.color;
+    this.context.fillRect(2 * drawingScale, 2 * drawingScale, drawingScale, 7 * drawingScale);
+    this.context.fillStyle = this.color2;
+    this.context.fillRect(3 * drawingScale,8 * drawingScale, drawingScale, drawingScale);
+    // Draw blades.
+    this.context.translate(2.5 * drawingScale, 2.5 * drawingScale);
+    this.context.rotate((Math.floor(this.frame / 20) * 15 ) * (Math.PI / 180));
+    for(var r = 0; r < 4; r++){
+      this.context.fillStyle = this.color;
+      this.context.beginPath();
+      this.context.moveTo(-2.5 * drawingScale, -2.5 * drawingScale);
+      this.context.lineTo(-1.5 * drawingScale, -2.5 * drawingScale);
+      this.context.lineTo(0.5 * drawingScale, -0.5 * drawingScale);
+      this.context.lineTo(-0.5 * drawingScale, 0.5 * drawingScale);
+      this.context.lineTo(-2.5 * drawingScale, -1.5 * drawingScale);
+      this.context.fill();
+      this.context.rotate(90 * (Math.PI / 180));
+    };
+    for(var r = 0; r < 4; r++){
+      this.context.fillStyle = this.color2;
+      this.context.beginPath();
+      this.context.moveTo(-1.5 * drawingScale, -2.5 * drawingScale);
+      this.context.lineTo(0.5 * drawingScale, -0.5 * drawingScale);
+      this.context.lineTo(-0.5 * drawingScale, -0.5 * drawingScale);
+      this.context.lineTo(-1.5 * drawingScale, -1.5 * drawingScale);
+      this.context.fill();
+      this.context.rotate(90 * Math.PI / 180);
+    };
+    this.context.fillStyle = this.color;
+    this.context.fillRect(-0.5, -0.5, 0.5, 0.5);
+    // Restore the coordinate system.
+    this.context.restore();
   };
 };
+
+function SolarPanel(xPos, yPos){
+  /*
+    Object to handle a solar panal. Write once and reuse.
+  */
+  this.context = context; // The context object to use for drawing.
+  this.x = xPos;  // X coordinate of the sprite.
+  this.y = yPos;  // Y coordinate of the sprite.
+  this.color = "grey";  // Primary color of the sprite.
+  this.color2 = "blue"; // Secondary color of the sprite.
+  this.color3 = "lightblue"; // Third color for the sprite.
+  this.generation = 0;  // Amount of power the building is generating.
+
+  this.update = function(){
+
+  }
+  this.render = function(){
+    // Move the coordinate system.
+    this.context.save()
+    this.context.translate(this.x, this.y);
+    // Draw the base.
+    this.context.fillStyle = this.color;
+    this.context.fillRect(0, drawingScale, drawingScale, 2 * drawingScale);
+    // Draw panel.
+    this.context.fillStyle = this.color2;
+    this.context.beginPath();
+    this.context.moveTo(0, 0);
+    this.context.lineTo(drawingScale, drawingScale);
+    this.context.lineTo(0, drawingScale);
+    this.context.fill();
+    this.context.beginPath();
+    this.context.moveTo(drawingScale, drawingScale);
+    this.context.lineTo(2 * drawingScale, 2 * drawingScale);
+    this.context.lineTo(drawingScale, 2 * drawingScale);
+    this.context.fill();
+    this.context.beginPath();
+    this.context.fillStyle = this.color3;
+    this.context.moveTo(0, drawingScale);
+    this.context.lineTo(drawingScale, drawingScale);
+    this.context.lineTo(drawingScale, 2 * drawingScale);
+    this.context.fill()
+    // Restore the coordinate system.
+    this.context.restore();
+  }
+}
 
 var gameState = new game(); // Create a new game() object.
 var buildings = [new Office(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
                  new Office(105 * drawingScale, 25  * drawingScale),
                  new House(80  * drawingScale, 50 * drawingScale),
                  new House(92.5  * drawingScale, 50 * drawingScale),
-                 new House(105  * drawingScale, 50 * drawingScale)]
+                 new House(105  * drawingScale, 50 * drawingScale),
+                 new WindTurbine(250 * drawingScale, 60 * drawingScale),
+                 new WindTurbine(230 * drawingScale, 60 * drawingScale),
+                 new WindTurbine(210 * drawingScale, 60 * drawingScale),
+                 new SolarPanel(250 * drawingScale, 20 * drawingScale)]
 var buildingsLength = buildings.length;
 
 var loop = kontra.gameLoop({  // Create the kontra endless game loop.
