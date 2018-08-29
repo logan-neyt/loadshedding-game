@@ -92,17 +92,20 @@ function game(){
   };
   this.gui = function (){  // Render the game's GUI.
     // Clock and date.
+    context.save()
+    context.translate(canvasWidth, 0);  // Move the coordinate system.
     context.fillStyle = this.color;
     context.beginPath();
-    context.moveTo(canvasWidth, 8 * drawingScale);
-    context.lineTo(canvasWidth - (60 * drawingScale), 8 * drawingScale);
-    context.lineTo(canvasWidth - (64 * drawingScale), 4 * drawingScale);
-    context.lineTo(canvasWidth - (64 * drawingScale), 0);
-    context.lineTo(canvasWidth, 0);
+    context.moveTo(0, 8 * drawingScale);
+    context.lineTo(-60 * drawingScale, 8 * drawingScale);
+    context.lineTo(-64 * drawingScale, 4 * drawingScale);
+    context.lineTo(-64 * drawingScale, 0);
+    context.lineTo(0, 0);
     context.fill();
     context.font = Math.round(6 * drawingScale) + "px Nova Flat";
     context.fillStyle = "white";
-    context.fillText(this.friendlyTime() + "  Day " + this.day, canvasWidth - (54 * drawingScale), 6 * drawingScale);
+    context.fillText(this.friendlyTime() + "  Day " + this.day, -54 * drawingScale, 6 * drawingScale);
+    context.restore();  // Restore the coordinate system.
   }
 };
 
