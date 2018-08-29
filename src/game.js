@@ -108,38 +108,46 @@ function game(){
 
 function House(xPos, yPos){
   /*
-    Object to handle an house building. Write once and reuse.
+    Object to handle a house building. Write once and reuse.
   */
   this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
   this.color = "grey";  // Primary color of the sprite.
-  this.color2 = "blue"; // Secondary color of the sprite.
+  this.color2 = ""; // Secondary color of the sprite.
   this.consumption = 0;  // Amount of power the building is consuming.
+
+  this.color2Possibles = ["blue", "red", "lightgreen", "orange"];
+  this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
 
   this.update = function (){  // Update the state of the object.
 
   };
   this.render = function (){  // Render the sprite.
+    // Move the coordinate system.
+    this.context.save();
+    this.context.translate(this.x, this.y);
     // Draw chimney.
     this.context.fillStyle = this.color;
-    this.context.fillRect(this.x + drawingScale, this.y, drawingScale, 2 * drawingScale);
+    this.context.fillRect(drawingScale, 0, drawingScale, 2 * drawingScale);
     // Draw roof.
     this.context.fillStyle = this.color2;
     this.context.beginPath();
-    this.context.moveTo(this.x, this.y + (2 * drawingScale));
-    this.context.lineTo(this.x + (4 * drawingScale), this.y);
-    this.context.lineTo(this.x + (8 * drawingScale), this.y + (2 * drawingScale));
+    this.context.moveTo(0, 2 * drawingScale);
+    this.context.lineTo(4 * drawingScale, 0);
+    this.context.lineTo(8 * drawingScale, 2 * drawingScale);
     this.context.fill();
     // Draw walls.
     this.context.fillStyle = this.color;
-    this.context.fillRect(this.x, this.y + (2 * drawingScale), 8 * drawingScale, 4 * drawingScale);
+    this.context.fillRect(0, 2 * drawingScale, 8 * drawingScale, 4 * drawingScale);
     // Draw window.
     this.context.fillStyle = "black";
-    this.context.fillRect(this.x + drawingScale, this.y + (3 * drawingScale), 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(drawingScale, 3 * drawingScale, 2 * drawingScale, 2 * drawingScale);
     // Draw door.
     this.context.fillStyle = "black";
-    this.context.fillRect(this.x + (5 * drawingScale), this.y + (3 * drawingScale), 2 * drawingScale, 3 * drawingScale);
+    this.context.fillRect(5 * drawingScale, 3 * drawingScale, 2 * drawingScale, 3 * drawingScale);
+    // Restore the coordinate system.
+    this.context.restore();
   };
 };
 
@@ -157,24 +165,31 @@ function Office(xPos, yPos){
 
   };
   this.render = function (){  // Render the sprite.
+    // Move the coordinate system.
+    this.context.save();
+    this.context.translate(this.x, this.y);
     // Draw walls.
     this.context.fillStyle = this.color;
-    this.context.fillRect(this.x, this.y, 13 * drawingScale, 12 * drawingScale);
+    this.context.fillRect(0, 0, 13 * drawingScale, 12 * drawingScale);
     // Draw windows.
     this.context.fillStyle = "black";
-    this.context.fillRect(this.x + drawingScale, this.y + drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(this.x + (4 * drawingScale), this.y + drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(this.x + (7 * drawingScale), this.y + drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(this.x + (10 * drawingScale), this.y + drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(this.x + drawingScale, this.y + (5 * drawingScale), 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(this.x + (4 * drawingScale), this.y + (5 * drawingScale), 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(this.x + (7 * drawingScale), this.y + (5 * drawingScale), 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(this.x + (10 * drawingScale), this.y + (5 * drawingScale), 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(this.x + drawingScale, this.y + (9 * drawingScale), 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(this.x + (10 * drawingScale), this.y + (9 * drawingScale), 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(4 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(7 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(10 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(drawingScale, (5 * drawingScale), 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(4 * drawingScale, 5 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(7 * drawingScale, 5 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(10 * drawingScale, 5 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(drawingScale, 9 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    this.context.fillRect(10 * drawingScale, 9 * drawingScale, 2 * drawingScale, 2 * drawingScale);
     // Draw door.
     this.context.fillStyle = "black";
-    this.context.fillRect(this.x + (5 * drawingScale), this.y + (8 * drawingScale), 3 * drawingScale, 4 * drawingScale);
+    this.context.fillRect(5 * drawingScale, 8 * drawingScale, 3 * drawingScale, 4 * drawingScale);
+    // Restore the coordinate system.
+    this.context.restore();
+  };
+};
   };
 };
 
