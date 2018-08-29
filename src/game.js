@@ -51,11 +51,11 @@ function game(){
   this.gridFail = 300;  // Counts down to fail if the amount of power being consumend exceded the power being generated.
 
   this.friendlyTime = function(){ // Return the game time in a 24 hour format.
-    this.hours = Math.round(this.time / 750);
+    this.hours = Math.floor(this.time / 750);
     if(this.hours < 10){  // If the hours are fewer than 10 then add a leading zero.
       this.hours = "0" + this.hours;
     }
-    this.mins = Math.round(this.time / 12.5) % 60;
+    this.mins = Math.floor(this.time / 12.5) % 60;
     if(this.mins < 10){  // If the mins are fewer than 10 then add a leading zero.
       this.mins = "0" + this.mins;
     }
