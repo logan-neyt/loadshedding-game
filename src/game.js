@@ -191,6 +191,65 @@ function Office(xPos, yPos){
   };
 };
 
+function Factory(xPos, yPos){
+  /*
+    Object to handle a factory building. Write once and reuse.
+  */
+  this.context = context; // The context object to use for drawing.
+  this.x = xPos;  // X coordinate of the sprite.
+  this.y = yPos;  // Y coordinate of the sprite.
+  this.color = "grey";  // Primary color of the sprite.
+  this.color2 = ""; // Secondary color of the sprite.
+  this.powered = true;  // If the building is powered
+  this.consumption = 0;  // Amount of power the building is consuming.
+
+  this.color2Possibles = ["blue", "red", "lightgreen", "orange"];
+  this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
+
+  this.update = function(){
+
+  };
+  this.render = function(){
+    // Move the coordinate system.
+    this.context.save();
+    this.context.translate(this.x, this.y);
+    // Draw chimneys.
+    this.context.fillStyle = this.color;
+    this.context.fillRect(drawingScale, 0, drawingScale, 4 * drawingScale);
+    this.context.fillRect(4 * drawingScale, 0, drawingScale, 4 * drawingScale);
+    // Draw walls.
+    this.context.fillStyle = this.color;
+    this.context.fillRect(0, 4 * drawingScale, 12 * drawingScale, 6 * drawingScale);
+    // Draw door.
+    this.context.fillStyle = "black";
+    this.context.fillRect(9 * drawingScale, 7 * drawingScale, 2 * drawingScale, 3 * drawingScale);
+    // Draw windows.
+    if((gameState.time >= 13500 || gameState.time <= 4875) && this.powered){  // Check if the lights should be on or off.
+      this.context.fillStyle = "yellow";
+    } else {
+      this.context.fillStyle = "black";
+    }
+    this.context.fillRect(drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
+    this.context.fillRect(4 * drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
+    this.context.fillRect(7 * drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
+    // Draw roof.
+    this.context.fillStyle = this.color2;
+    this.context.beginPath();
+    this.context.moveTo(0, 4 * drawingScale);
+    this.context.lineTo(0, 2 * drawingScale);
+    this.context.lineTo(3 * drawingScale, 4 * drawingScale);
+    this.context.lineTo(3 * drawingScale, 2 * drawingScale);
+    this.context.lineTo(6 * drawingScale, 4 * drawingScale);
+    this.context.lineTo(6 * drawingScale, 2 * drawingScale);
+    this.context.lineTo(9 * drawingScale, 4 * drawingScale);
+    this.context.lineTo(9 * drawingScale, 2 * drawingScale);
+    this.context.lineTo(12 * drawingScale, 4 * drawingScale);
+    this.context.fill();
+    // Restore the coordinate system.
+    this.context.restore();
+  };
+};
+
 function WindTurbine(xPos, yPos){
   /*
     Object to handle a wind turbine. Write once and reuse.
@@ -304,7 +363,8 @@ var buildings = [new Office(80 * drawingScale, 25  * drawingScale),  // Create a
                  new WindTurbine(250 * drawingScale, 60 * drawingScale),
                  new WindTurbine(230 * drawingScale, 60 * drawingScale),
                  new WindTurbine(210 * drawingScale, 60 * drawingScale),
-                 new SolarPanel(250 * drawingScale, 20 * drawingScale)]
+                 new SolarPanel(250 * drawingScale, 20 * drawingScale),
+                 new Factory(80 * drawingScale, 100 * drawingScale)]
 var buildingsLength = buildings.length;
 
 var loop = kontra.gameLoop({  // Create the kontra endless game loop.
