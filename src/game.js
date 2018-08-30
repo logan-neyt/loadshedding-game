@@ -41,13 +41,17 @@ function game(){
   */
   this.context = context; // The context object to use for drawing.
   this.color = "blue";  // The primary color used in the GUI.
+  this.font = "px Nova Flat"; // The font used for the GUI (Scale will be provided when drawing.).
 
   this.time = 9000;  // The time of day in the game.
   this.day = 1;   // How many in game days have elapsed.
-  this.weather = 0; // The in game weather state.
+  this.sunlight = 10; // Brightness of the sun(dependent on time, independent of cloud cover).
+  this.weather = ""; // The in game weather state.
+  this.wind = 0;  // The amount of wind.
+  this.clouds = 0;  // Density of cloud cover.
   this.weatherDelay = 0;  // How many cycles before the weather changes. Stops the weather from changing every cycle.
-  this.powerGenerated = 0; // How much power is being generated.
-  this.powerConsumed = 10; // How much power is being consumed.
+  this.powerGenerated = 1; // How much power is being generated.
+  this.powerConsumed = 0; // How much power is being consumed.
   this.gridFail = 300;  // Counts down to fail if the amount of power being consumend exceded the power being generated.
 
   this.friendlyTime = function(){ // Return the game time in a 24 hour format.
@@ -84,13 +88,52 @@ function game(){
       this.gridFail--;  // Continue the countdown.
     } else {  // If the grid is fine
       this.gridFail = 300;  // Reset the count down.
-    }
+    };
+    // Clear the power variables for the next turn.
+    this.powerGenerated = 1;
+    this.powerConsumed = 0;
+    // Update the weather.
+    this.weatherDelay--;
+    if (this.weatherDelay <= 0){  // If the weather must be changed.
+      this.wind = getRandomInt(11);
+      this.clouds = getRandomInt(11);
+      if(this.wind < 2){
+        this.weather = "Calm";
+      }else if (this.wind < 5) {
+        this.weather = "Breezy";
+      } else if (this.wind < 7) {
+        this.weather = "Windy";
+      } else {
+        this.weather = "Gale";
+      }
+      if(this.clouds > 7){
+        this.weather = this.weather + ", Overcast";
+      } else if (this.clouds > 3) {
+        this.weather = this.weather + ", Cloudy";
+      } else{
+        this.weather = this.weather + ", Clear"
+      }
+      this.weatherDelay = getRandomInt(18000) + 360;
+    };
   };
   this.backLayer = function (){ // Render the background for the map.
     context.fillStyle = "green";
     context.fillRect(0, 0, canvasWidth, canvasHeight);
   };
   this.gui = function (){  // Render the game's GUI.
+    // Running stats.
+    context.save();
+    context.fillStyle = this.color;
+    context.beginPath();
+    context.moveTo(0, 8 * drawingScale);
+    context.lineTo(100 * drawingScale, 8 * drawingScale);
+    context.lineTo(104 * drawingScale, 4 * drawingScale);
+    context.lineTo(104 * drawingScale, 0);
+    context.lineTo(0, 0);
+    context.fill();
+    context.font = Math.round(6 * drawingScale) + this.font;
+    context.fillStyle = "#FFFFFF";
+    context.fillText(this.weather, 58 * drawingScale, 6 * drawingScale);
     // Clock and date.
     context.save()
     context.translate(canvasWidth, 0);  // Move the coordinate system.
@@ -102,8 +145,8 @@ function game(){
     context.lineTo(-64 * drawingScale, 0);
     context.lineTo(0, 0);
     context.fill();
-    context.font = Math.round(6 * drawingScale) + "px Nova Flat";
-    context.fillStyle = "white";
+    context.font = Math.round(6 * drawingScale) + this.font;
+    context.fillStyle = "#FFFFFF";
     context.fillText(this.friendlyTime() + "  Day " + this.day, -54 * drawingScale, 6 * drawingScale);
     context.restore();  // Restore the coordinate system.
   }
@@ -124,7 +167,7 @@ function House(xPos, yPos){
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
 
   this.update = function (){  // Update the state of the object.
-
+    gameState.consume(this.consumption);  // Update the gameState's variables.
   };
   this.render = function (){  // Render the sprite.
     // Move the coordinate system.
@@ -165,7 +208,7 @@ function Office(xPos, yPos){
   this.consumption = 0;  // Amount of power the building is consuming.
 
   this.update = function (){  // Update the state of the object.
-
+    gameState.consume(this.consumption);  // Update the gameState's variables.
   };
   this.render = function (){  // Render the sprite.
     // Move the coordinate system.
@@ -263,14 +306,24 @@ function WindTurbine(xPos, yPos){
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = "darkgrey"; // Secondary color of the sprite.
   this.frame = getRandomInt(8) * 15; // The animation frame the sprite is currently in.
+  this.powered = true;  // If the building is active.
   this.generation = 0;  // Amount of power the building is generating.
 
   this.update = function(){
     // Increment the animation.
-    this.frame++;
-    if(this.frame >= 120){
-      this.frame = 0;
+    if(this.powered && gameState.wind > 0){  // If building is active and there is wind
+      this.frame = this.frame + gameState.wind;
+      if(this.frame >= 120){
+        this.frame = 0;
+      };
     };
+    // Calculate generation.
+    if(this.powered){
+      this.generation = 1.5 * gameState.wind;
+    } else {
+      this.generation = 0;
+    }
+    gameState.generate(this.generation);  // Update the gameState's variables.
   };
   this.render = function(){
     // Move the coordinate system.
@@ -322,10 +375,21 @@ function SolarPanel(xPos, yPos){
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = "blue"; // Secondary color of the sprite.
   this.color3 = "lightblue"; // Third color for the sprite.
+  this.powered = true;  // If this building is active.
   this.generation = 0;  // Amount of power the building is generating.
 
   this.update = function(){
-
+    // Calculate generation.
+    if(this.powered){
+      if(gameState.clouds == 0){  // Protect against zero devisions.
+        this.generation = gameState.sunlight;
+      }else{
+        this.generation = gameState.sunlight / gameState.clouds;
+      }
+    }else{
+      this.generation = 0;
+    }
+    gameState.generate(this.generation);  // Update the gameState's variables.
   }
   this.render = function(){
     // Move the coordinate system.
