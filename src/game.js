@@ -11,16 +11,11 @@ function resizeCanvas(){
   /*
     Set the size of the canvas to maintain a constant aspect ratio.
    */
-  if (window.innerWidth > window.innerHeight / 2){
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerWidth / 2;
-  } else {
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerHeight * 2;
-  };
+  canvas.height = window.innerHeight * 2;
+  canvas.width = window.innerWidth * 2;
   canvasHeight = canvas.height; // Set the height of the canvas.
   canvasWidth = canvas.width; // Set the width of the canvas.
-  drawingScale = canvasWidth / 512; // Set the distance between grid references.
+  drawingScale = canvasWidth / 384; // Set the distance between grid references.
 }
 
 function getRandomInt(max) {
@@ -40,7 +35,8 @@ function game(){
     Object to track and update the game's state.
   */
   this.context = context; // The context object to use for drawing.
-  this.color = "blue";  // The primary color used in the GUI.
+  this.color = "#0077c2";  // The primary color used in the GUI.
+  this.textColor = "#fafafa"; // The color used for the text.
   this.font = "px Nova Flat"; // The font used for the GUI (Scale will be provided when drawing.).
 
   this.time = 9000;  // The time of day in the game.
@@ -79,12 +75,12 @@ function game(){
     if(this.time >= 18000){  // If it is the next day.
       this.day++;
       this.time = this.time - 18000;
-    }
+    };
     // Check that the amount of power being consumend does not excede the power being generated.
     if (this.powerGenerated < this.powerConsumed){
       if (this.gridFail <= 0){  // Test for end game condition.
         endGame(this.day, this.time);
-      }
+      };
       this.gridFail--;  // Continue the countdown.
     } else {  // If the grid is fine
       this.gridFail = 300;  // Reset the count down.
@@ -132,7 +128,8 @@ function game(){
     context.lineTo(0, 0);
     context.fill();
     context.font = Math.round(6 * drawingScale) + this.font;
-    context.fillStyle = "#FFFFFF";
+    context.fillStyle = this.textColor;
+    context.fillText(Math.floor(this.powerGenerated) + " / "+ Math.floor(this.powerConsumed), 30 * drawingScale, 6 * drawingScale);
     context.fillText(this.weather, 58 * drawingScale, 6 * drawingScale);
     // Clock and date.
     context.save()
@@ -146,7 +143,7 @@ function game(){
     context.lineTo(0, 0);
     context.fill();
     context.font = Math.round(6 * drawingScale) + this.font;
-    context.fillStyle = "#FFFFFF";
+    context.fillStyle = this.textColor;
     context.fillText(this.friendlyTime() + "  Day " + this.day, -54 * drawingScale, 6 * drawingScale);
     context.restore();  // Restore the coordinate system.
   }
@@ -161,6 +158,7 @@ function House(xPos, yPos){
   this.y = yPos;  // Y coordinate of the sprite.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = ""; // Secondary color of the sprite.
+  this.powered = true;  // If the building is active.
   this.consumption = 0;  // Amount of power the building is consuming.
 
   this.color2Possibles = ["blue", "red", "lightgreen", "orange"];
@@ -187,10 +185,14 @@ function House(xPos, yPos){
     this.context.fillStyle = this.color;
     this.context.fillRect(0, 2 * drawingScale, 8 * drawingScale, 4 * drawingScale);
     // Draw window.
-    this.context.fillStyle = "black";
+    if((gameState.time >= 13500 || gameState.time <= 4875) && this.powered){  // Check if the lights should be on or off.
+      this.context.fillStyle = "#ffff8b";
+    } else {
+      this.context.fillStyle = "#000000";
+    };
     this.context.fillRect(drawingScale, 3 * drawingScale, 2 * drawingScale, 2 * drawingScale);
     // Draw door.
-    this.context.fillStyle = "black";
+    this.context.fillStyle = "#000000";
     this.context.fillRect(5 * drawingScale, 3 * drawingScale, 2 * drawingScale, 3 * drawingScale);
     // Restore the coordinate system.
     this.context.restore();
@@ -205,6 +207,7 @@ function Office(xPos, yPos){
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
   this.color = "grey";  // Primary color of the sprite.
+  this.powered = true;  // If the building is active.
   this.consumption = 0;  // Amount of power the building is consuming.
 
   this.update = function (){  // Update the state of the object.
@@ -218,7 +221,11 @@ function Office(xPos, yPos){
     this.context.fillStyle = this.color;
     this.context.fillRect(0, 0, 13 * drawingScale, 12 * drawingScale);
     // Draw windows.
-    this.context.fillStyle = "black";
+    if((gameState.time >= 13500 || gameState.time <= 4875) && this.powered){  // Check if the lights should be on or off.
+      this.context.fillStyle = "#ffff8b";
+    } else {
+      this.context.fillStyle = "#000000";
+    };
     this.context.fillRect(drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
     this.context.fillRect(4 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
     this.context.fillRect(7 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
@@ -230,7 +237,7 @@ function Office(xPos, yPos){
     this.context.fillRect(drawingScale, 9 * drawingScale, 2 * drawingScale, 2 * drawingScale);
     this.context.fillRect(10 * drawingScale, 9 * drawingScale, 2 * drawingScale, 2 * drawingScale);
     // Draw door.
-    this.context.fillStyle = "black";
+    this.context.fillStyle = "#000000";
     this.context.fillRect(5 * drawingScale, 8 * drawingScale, 3 * drawingScale, 4 * drawingScale);
     // Restore the coordinate system.
     this.context.restore();
@@ -253,7 +260,7 @@ function Factory(xPos, yPos){
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
 
   this.update = function(){
-
+    //gameState.consume(this.consumption);  // Update the gameState's variables.
   };
   this.render = function(){
     // Move the coordinate system.
@@ -271,10 +278,10 @@ function Factory(xPos, yPos){
     this.context.fillRect(9 * drawingScale, 7 * drawingScale, 2 * drawingScale, 3 * drawingScale);
     // Draw windows.
     if((gameState.time >= 13500 || gameState.time <= 4875) && this.powered){  // Check if the lights should be on or off.
-      this.context.fillStyle = "yellow";
+      this.context.fillStyle = "#ffff8b";
     } else {
-      this.context.fillStyle = "black";
-    }
+      this.context.fillStyle = "#000000";
+    };
     this.context.fillRect(drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
     this.context.fillRect(4 * drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
     this.context.fillRect(7 * drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
@@ -442,11 +449,12 @@ var loop = kontra.gameLoop({  // Create the kontra endless game loop.
     }
   },
   render: function() {
-    gameState.backLayer();
+    context.setTransform(1, 0, 0, 1, 0, 0); // Reset current transformation matrix to the identity matrix
+    gameState.backLayer();  // Draw the background.
     for (var i = 0; i < buildingsLength; i++){  // Render all the building sprites.
       buildings[i].render();
     }
-    gameState.gui();
+    gameState.gui();  // Draw the game's GUI.
   }
 });
 
