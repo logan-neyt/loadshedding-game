@@ -7,6 +7,9 @@ var canvasWidth; // The width of the canvas.
 var drawingScale; // Distance between grid references used in drawing.
 resizeCanvas()
 
+var gameState;  // Create a global gameState variable.
+newGame();  // Start the first game.
+
 function resizeCanvas(){
   /*
     Set the size of the canvas to maintain a constant aspect ratio.
@@ -29,7 +32,9 @@ function endGame(day, time){
   /*
     Display the end game screen.
   */
-}
+  loop.stop()  // Stop the game loop.
+};
+
 function game(){
   /*
     Object to track and update the game's state.
@@ -428,34 +433,36 @@ function SolarPanel(xPos, yPos){
   }
 }
 
-var gameState = new game(); // Create a new game() object.
-var buildings = [new Office(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
-                 new Office(105 * drawingScale, 25  * drawingScale),
-                 new House(80  * drawingScale, 50 * drawingScale),
-                 new House(92.5  * drawingScale, 50 * drawingScale),
-                 new House(105  * drawingScale, 50 * drawingScale),
-                 new WindTurbine(250 * drawingScale, 60 * drawingScale),
-                 new WindTurbine(230 * drawingScale, 60 * drawingScale),
-                 new WindTurbine(210 * drawingScale, 60 * drawingScale),
-                 new SolarPanel(250 * drawingScale, 20 * drawingScale),
-                 new Factory(80 * drawingScale, 100 * drawingScale)]
-var buildingsLength = buildings.length;
+function newGame(){
+  gameState = new game(); // Create a new game() object.
+  var buildings = [new Office(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
+                   new Office(105 * drawingScale, 25  * drawingScale),
+                   new House(80  * drawingScale, 50 * drawingScale),
+                   new House(92.5  * drawingScale, 50 * drawingScale),
+                   new House(105  * drawingScale, 50 * drawingScale),
+                   new WindTurbine(250 * drawingScale, 60 * drawingScale),
+                   new WindTurbine(230 * drawingScale, 60 * drawingScale),
+                   new WindTurbine(210 * drawingScale, 60 * drawingScale),
+                   new SolarPanel(250 * drawingScale, 20 * drawingScale),
+                   new Factory(80 * drawingScale, 100 * drawingScale)]
+  var buildingsLength = buildings.length;
 
-var loop = kontra.gameLoop({  // Create the kontra endless game loop.
-  update: function(){
-    gameState.update();
-    for (var i = 0; i < buildingsLength; i++){  // Update all the buildings in the array.
-      buildings[i].update();
+  loop = kontra.gameLoop({  // Create the kontra endless game loop.
+    update: function(){
+      gameState.update();
+      for (var i = 0; i < buildingsLength; i++){  // Update all the buildings in the array.
+        buildings[i].update();
+      }
+    },
+    render: function() {
+      context.setTransform(1, 0, 0, 1, 0, 0); // Reset current transformation matrix to the identity matrix
+      gameState.backLayer();  // Draw the background.
+      for (var i = 0; i < buildingsLength; i++){  // Render all the building sprites.
+        buildings[i].render();
+      }
+      gameState.gui();  // Draw the game's GUI.
     }
-  },
-  render: function() {
-    context.setTransform(1, 0, 0, 1, 0, 0); // Reset current transformation matrix to the identity matrix
-    gameState.backLayer();  // Draw the background.
-    for (var i = 0; i < buildingsLength; i++){  // Render all the building sprites.
-      buildings[i].render();
-    }
-    gameState.gui();  // Draw the game's GUI.
-  }
-});
+  });
 
-loop.start(); // Start game loop.
+  loop.start(); // Start game loop.
+};
