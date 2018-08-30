@@ -7,6 +7,7 @@ var canvasWidth; // The width of the canvas.
 var drawingScale; // Distance between grid references used in drawing.
 resizeCanvas()
 
+var loop; // Create a global loop variable.
 var gameState;  // Create a global gameState variable.
 newGame();  // Start the first game.
 
