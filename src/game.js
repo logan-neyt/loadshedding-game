@@ -47,6 +47,7 @@ function defaultSidebar(){
   this.color2 = "#0d47a1"; // The secondary color used in the sidebars.
   this.color3 = "#0d47a1"; // The accent color used in the sidebars.
   this.textColor = "#fafafa"; // The color used for the text.
+  this.font = "px Nova Flat"; // The font used for the sidebars (Scale will be provided when drawing).
   this.selectionColor = "#ef5350"; // The color of the selection cursor.
 
   this.cursorAnimation = 0; // The frame the cursor animation is on.
@@ -81,7 +82,27 @@ function defaultSidebar(){
     };
   };
   this.render = function(){ // Draw the sidebar when nothing is selected(otherwise drawing is handled by the selected object).
+    // Draw the default backdrop.
     this.backdrop();
+    // Move the coordinate system.
+    context.save();
+    context.translate(0, 8 * drawingScale);
+    // Draw boxes.
+    context.fillStyle = this.color2;
+    context.fillRect(drawingScale, drawingScale, this.width - (3 * drawingScale), 13 * drawingScale);
+    context.fillRect(drawingScale, 15 * drawingScale, this.width - (3 * drawingScale), 31 * drawingScale);
+    // Draw text.
+    context.font = Math.round(6 * drawingScale) + this.font;
+    context.fillStyle = this.textColor;
+    context.fillText("Score", 2 * drawingScale, 6 * drawingScale)
+    context.fillText(Math.floor(gameState.score) + " kWH", 7 * drawingScale, 12 * drawingScale);
+    context.fillText("Weather Forecast", 2 * drawingScale, 20 * drawingScale);
+    context.fillText("1hr - ", 7 * drawingScale, 26 * drawingScale);
+    context.fillText("2hr - ", 7 * drawingScale, 32 * drawingScale);
+    context.fillText("5hr - ", 7 * drawingScale, 38 * drawingScale);
+    context.fillText("12hr - ", 4 * drawingScale, 44 * drawingScale);
+    // Restore the coordinate system.
+    context.restore();
   };
   this.cursor = function(x, y, x2, y2){
     // Calculate the size of the sprite in pixels.
@@ -113,6 +134,7 @@ function game(){
   this.textColor = "#fafafa"; // The color used for the text.
   this.font = "px Nova Flat"; // The font used for the GUI (Scale will be provided when drawing).
 
+  this.score = 0; // The player's score.
   this.time = 9000;  // The time of day in the game.
   this.day = 1;   // How many in game days have elapsed.
   this.sunlight = 10; // Brightness of the sun(dependent on time, independent of cloud cover).
@@ -177,6 +199,7 @@ function game(){
       this.gridFail--;  // Continue the countdown.
     } else {  // If the grid is fine
       this.gridFail = 300;  // Reset the count down.
+      this.score = this.score + (this.powerConsumed / 750); // If all is well, add to the player's score.
     };
     // Clear the power variables for the next turn.
     this.powerGenerated = 1;
@@ -330,6 +353,7 @@ function Office(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
+    defaultSidebar.backdrop();
 
   };
   this.onClick = function(){
@@ -396,6 +420,7 @@ function Factory(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
+    defaultSidebar.backdrop();
 
   };
   this.onClick = function(){
@@ -472,6 +497,7 @@ function WindTurbine(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
+    defaultSidebar.backdrop();
 
   };
   this.onClick = function(){
@@ -535,7 +561,8 @@ function SolarPanel(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-
+    defaultSidebar.backdrop();
+    
   };
   this.onClick = function(){
 
