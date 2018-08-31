@@ -109,7 +109,6 @@ function game(){
   /*
     Object to track and update the game's state.
   */
-  this.context = context; // The context object to use for drawing.
   this.color = "#0d47a1";  // The primary color used in the GUI.
   this.textColor = "#fafafa"; // The color used for the text.
   this.font = "px Nova Flat"; // The font used for the GUI (Scale will be provided when drawing).
@@ -228,7 +227,6 @@ function House(xPos, yPos){
   /*
     Object to handle a house building. Write once and reuse.
   */
-  this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
   this.x2 = xPos + (8 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
@@ -246,33 +244,33 @@ function House(xPos, yPos){
   };
   this.render = function (){  // Render the sprite.
     // Move the coordinate system.
-    this.context.save();
-    this.context.translate(this.x, this.y);
+    context.save();
+    context.translate(this.x, this.y);
     // Draw chimney.
-    this.context.fillStyle = this.color;
-    this.context.fillRect(drawingScale, 0, drawingScale, 2 * drawingScale);
+    context.fillStyle = this.color;
+    context.fillRect(drawingScale, 0, drawingScale, 2 * drawingScale);
     // Draw roof.
-    this.context.fillStyle = this.color2;
-    this.context.beginPath();
-    this.context.moveTo(0, 2 * drawingScale);
-    this.context.lineTo(4 * drawingScale, 0);
-    this.context.lineTo(8 * drawingScale, 2 * drawingScale);
-    this.context.fill();
+    context.fillStyle = this.color2;
+    context.beginPath();
+    context.moveTo(0, 2 * drawingScale);
+    context.lineTo(4 * drawingScale, 0);
+    context.lineTo(8 * drawingScale, 2 * drawingScale);
+    context.fill();
     // Draw walls.
-    this.context.fillStyle = this.color;
-    this.context.fillRect(0, 2 * drawingScale, 8 * drawingScale, 4 * drawingScale);
+    context.fillStyle = this.color;
+    context.fillRect(0, 2 * drawingScale, 8 * drawingScale, 4 * drawingScale);
     // Draw window.
     if((gameState.time >= 13500 || gameState.time <= 4875) && this.powered){  // Check if the lights should be on or off.
-      this.context.fillStyle = "#ffff8b";
+      context.fillStyle = "#ffff8b";
     } else {
-      this.context.fillStyle = "#000000";
+      context.fillStyle = "#000000";
     };
-    this.context.fillRect(drawingScale, 3 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(drawingScale, 3 * drawingScale, 2 * drawingScale, 2 * drawingScale);
     // Draw door.
-    this.context.fillStyle = "#000000";
-    this.context.fillRect(5 * drawingScale, 3 * drawingScale, 2 * drawingScale, 3 * drawingScale);
+    context.fillStyle = "#000000";
+    context.fillRect(5 * drawingScale, 3 * drawingScale, 2 * drawingScale, 3 * drawingScale);
     // Restore the coordinate system.
-    this.context.restore();
+    context.restore();
   };
   this.sidebar = function(){
     defaultSidebar.backdrop();
@@ -287,7 +285,6 @@ function Office(xPos, yPos){
   /*
     Object to handle an office building. Write once and reuse.
   */
-  this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
   this.x2 = xPos + (13 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
@@ -301,32 +298,32 @@ function Office(xPos, yPos){
   };
   this.render = function (){  // Render the sprite.
     // Move the coordinate system.
-    this.context.save();
-    this.context.translate(this.x, this.y);
+    context.save();
+    context.translate(this.x, this.y);
     // Draw walls.
-    this.context.fillStyle = this.color;
-    this.context.fillRect(0, 0, 13 * drawingScale, 12 * drawingScale);
+    context.fillStyle = this.color;
+    context.fillRect(0, 0, 13 * drawingScale, 12 * drawingScale);
     // Draw windows.
     if((gameState.time >= 13500 || gameState.time <= 4875) && this.powered){  // Check if the lights should be on or off.
-      this.context.fillStyle = "#ffff8b";
+      context.fillStyle = "#ffff8b";
     } else {
-      this.context.fillStyle = "#000000";
+      context.fillStyle = "#000000";
     };
-    this.context.fillRect(drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(4 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(7 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(10 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(drawingScale, (5 * drawingScale), 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(4 * drawingScale, 5 * drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(7 * drawingScale, 5 * drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(10 * drawingScale, 5 * drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(drawingScale, 9 * drawingScale, 2 * drawingScale, 2 * drawingScale);
-    this.context.fillRect(10 * drawingScale, 9 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(4 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(7 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(10 * drawingScale, drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(drawingScale, (5 * drawingScale), 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(4 * drawingScale, 5 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(7 * drawingScale, 5 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(10 * drawingScale, 5 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(drawingScale, 9 * drawingScale, 2 * drawingScale, 2 * drawingScale);
+    context.fillRect(10 * drawingScale, 9 * drawingScale, 2 * drawingScale, 2 * drawingScale);
     // Draw door.
-    this.context.fillStyle = "#000000";
-    this.context.fillRect(5 * drawingScale, 8 * drawingScale, 3 * drawingScale, 4 * drawingScale);
+    context.fillStyle = "#000000";
+    context.fillRect(5 * drawingScale, 8 * drawingScale, 3 * drawingScale, 4 * drawingScale);
     // Restore the coordinate system.
-    this.context.restore();
+    context.restore();
   };
   this.sidebar = function(){
 
@@ -340,7 +337,6 @@ function Factory(xPos, yPos){
   /*
     Object to handle a factory building. Write once and reuse.
   */
-  this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
   this.x2 = xPos + (12 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
@@ -358,42 +354,42 @@ function Factory(xPos, yPos){
   };
   this.render = function(){
     // Move the coordinate system.
-    this.context.save();
-    this.context.translate(this.x, this.y);
+    context.save();
+    context.translate(this.x, this.y);
     // Draw chimneys.
-    this.context.fillStyle = this.color;
-    this.context.fillRect(drawingScale, 0, drawingScale, 4 * drawingScale);
-    this.context.fillRect(4 * drawingScale, 0, drawingScale, 4 * drawingScale);
+    context.fillStyle = this.color;
+    context.fillRect(drawingScale, 0, drawingScale, 4 * drawingScale);
+    context.fillRect(4 * drawingScale, 0, drawingScale, 4 * drawingScale);
     // Draw walls.
-    this.context.fillStyle = this.color;
-    this.context.fillRect(0, 4 * drawingScale, 12 * drawingScale, 6 * drawingScale);
+    context.fillStyle = this.color;
+    context.fillRect(0, 4 * drawingScale, 12 * drawingScale, 6 * drawingScale);
     // Draw door.
-    this.context.fillStyle = "black";
-    this.context.fillRect(9 * drawingScale, 7 * drawingScale, 2 * drawingScale, 3 * drawingScale);
+    context.fillStyle = "black";
+    context.fillRect(9 * drawingScale, 7 * drawingScale, 2 * drawingScale, 3 * drawingScale);
     // Draw windows.
     if((gameState.time >= 13500 || gameState.time <= 4875) && this.powered){  // Check if the lights should be on or off.
-      this.context.fillStyle = "#ffff8b";
+      context.fillStyle = "#ffff8b";
     } else {
-      this.context.fillStyle = "#000000";
+      context.fillStyle = "#000000";
     };
-    this.context.fillRect(drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
-    this.context.fillRect(4 * drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
-    this.context.fillRect(7 * drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
+    context.fillRect(drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
+    context.fillRect(4 * drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
+    context.fillRect(7 * drawingScale, 5 * drawingScale, 2 * drawingScale, drawingScale);
     // Draw roof.
-    this.context.fillStyle = this.color2;
-    this.context.beginPath();
-    this.context.moveTo(0, 4 * drawingScale);
-    this.context.lineTo(0, 2 * drawingScale);
-    this.context.lineTo(3 * drawingScale, 4 * drawingScale);
-    this.context.lineTo(3 * drawingScale, 2 * drawingScale);
-    this.context.lineTo(6 * drawingScale, 4 * drawingScale);
-    this.context.lineTo(6 * drawingScale, 2 * drawingScale);
-    this.context.lineTo(9 * drawingScale, 4 * drawingScale);
-    this.context.lineTo(9 * drawingScale, 2 * drawingScale);
-    this.context.lineTo(12 * drawingScale, 4 * drawingScale);
-    this.context.fill();
+    context.fillStyle = this.color2;
+    context.beginPath();
+    context.moveTo(0, 4 * drawingScale);
+    context.lineTo(0, 2 * drawingScale);
+    context.lineTo(3 * drawingScale, 4 * drawingScale);
+    context.lineTo(3 * drawingScale, 2 * drawingScale);
+    context.lineTo(6 * drawingScale, 4 * drawingScale);
+    context.lineTo(6 * drawingScale, 2 * drawingScale);
+    context.lineTo(9 * drawingScale, 4 * drawingScale);
+    context.lineTo(9 * drawingScale, 2 * drawingScale);
+    context.lineTo(12 * drawingScale, 4 * drawingScale);
+    context.fill();
     // Restore the coordinate system.
-    this.context.restore();
+    context.restore();
   };
   this.sidebar = function(){
 
@@ -407,7 +403,6 @@ function WindTurbine(xPos, yPos){
   /*
     Object to handle a wind turbine. Write once and reuse.
   */
-  this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
   this.x2 = xPos + (5 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
@@ -436,41 +431,41 @@ function WindTurbine(xPos, yPos){
   };
   this.render = function(){
     // Move the coordinate system.
-    this.context.save();
-    this.context.translate(this.x, this.y);
+    context.save();
+    context.translate(this.x, this.y);
     // Draw base.
-    this.context.fillStyle = this.color;
-    this.context.fillRect(2 * drawingScale, 2 * drawingScale, drawingScale, 7 * drawingScale);
-    this.context.fillStyle = this.color2;
-    this.context.fillRect(3 * drawingScale,8 * drawingScale, drawingScale, drawingScale);
+    context.fillStyle = this.color;
+    context.fillRect(2 * drawingScale, 2 * drawingScale, drawingScale, 7 * drawingScale);
+    context.fillStyle = this.color2;
+    context.fillRect(3 * drawingScale,8 * drawingScale, drawingScale, drawingScale);
     // Draw blades.
-    this.context.translate(2.5 * drawingScale, 2.5 * drawingScale);
-    this.context.rotate((Math.floor(this.frame / 20) * 15 ) * (Math.PI / 180));
+    context.translate(2.5 * drawingScale, 2.5 * drawingScale);
+    context.rotate((Math.floor(this.frame / 20) * 15 ) * (Math.PI / 180));
     for(var r = 0; r < 4; r++){
-      this.context.fillStyle = this.color;
-      this.context.beginPath();
-      this.context.moveTo(-2.5 * drawingScale, -2.5 * drawingScale);
-      this.context.lineTo(-1.5 * drawingScale, -2.5 * drawingScale);
-      this.context.lineTo(0.5 * drawingScale, -0.5 * drawingScale);
-      this.context.lineTo(-0.5 * drawingScale, 0.5 * drawingScale);
-      this.context.lineTo(-2.5 * drawingScale, -1.5 * drawingScale);
-      this.context.fill();
-      this.context.rotate(90 * (Math.PI / 180));
+      context.fillStyle = this.color;
+      context.beginPath();
+      context.moveTo(-2.5 * drawingScale, -2.5 * drawingScale);
+      context.lineTo(-1.5 * drawingScale, -2.5 * drawingScale);
+      context.lineTo(0.5 * drawingScale, -0.5 * drawingScale);
+      context.lineTo(-0.5 * drawingScale, 0.5 * drawingScale);
+      context.lineTo(-2.5 * drawingScale, -1.5 * drawingScale);
+      context.fill();
+      context.rotate(90 * (Math.PI / 180));
     };
     for(var r = 0; r < 4; r++){
-      this.context.fillStyle = this.color2;
-      this.context.beginPath();
-      this.context.moveTo(-1.5 * drawingScale, -2.5 * drawingScale);
-      this.context.lineTo(0.5 * drawingScale, -0.5 * drawingScale);
-      this.context.lineTo(-0.5 * drawingScale, -0.5 * drawingScale);
-      this.context.lineTo(-1.5 * drawingScale, -1.5 * drawingScale);
-      this.context.fill();
-      this.context.rotate(90 * Math.PI / 180);
+      context.fillStyle = this.color2;
+      context.beginPath();
+      context.moveTo(-1.5 * drawingScale, -2.5 * drawingScale);
+      context.lineTo(0.5 * drawingScale, -0.5 * drawingScale);
+      context.lineTo(-0.5 * drawingScale, -0.5 * drawingScale);
+      context.lineTo(-1.5 * drawingScale, -1.5 * drawingScale);
+      context.fill();
+      context.rotate(90 * Math.PI / 180);
     };
-    this.context.fillStyle = this.color;
-    this.context.fillRect(-0.5, -0.5, 0.5, 0.5);
+    context.fillStyle = this.color;
+    context.fillRect(-0.5, -0.5, 0.5, 0.5);
     // Restore the coordinate system.
-    this.context.restore();
+    context.restore();
   };
   this.sidebar = function(){
 
@@ -484,7 +479,6 @@ function SolarPanel(xPos, yPos){
   /*
     Object to handle a solar panal. Write once and reuse.
   */
-  this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
   this.x2 = xPos + (2 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
@@ -510,31 +504,31 @@ function SolarPanel(xPos, yPos){
   };
   this.render = function(){
     // Move the coordinate system.
-    this.context.save()
-    this.context.translate(this.x, this.y);
+    context.save()
+    context.translate(this.x, this.y);
     // Draw the base.
-    this.context.fillStyle = this.color;
-    this.context.fillRect(0, drawingScale, drawingScale, 2 * drawingScale);
+    context.fillStyle = this.color;
+    context.fillRect(0, drawingScale, drawingScale, 2 * drawingScale);
     // Draw panel.
-    this.context.fillStyle = this.color2;
-    this.context.beginPath();
-    this.context.moveTo(0, 0);
-    this.context.lineTo(drawingScale, drawingScale);
-    this.context.lineTo(0, drawingScale);
-    this.context.fill();
-    this.context.beginPath();
-    this.context.moveTo(drawingScale, drawingScale);
-    this.context.lineTo(2 * drawingScale, 2 * drawingScale);
-    this.context.lineTo(drawingScale, 2 * drawingScale);
-    this.context.fill();
-    this.context.beginPath();
-    this.context.fillStyle = this.color3;
-    this.context.moveTo(0, drawingScale);
-    this.context.lineTo(drawingScale, drawingScale);
-    this.context.lineTo(drawingScale, 2 * drawingScale);
-    this.context.fill();
+    context.fillStyle = this.color2;
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(drawingScale, drawingScale);
+    context.lineTo(0, drawingScale);
+    context.fill();
+    context.beginPath();
+    context.moveTo(drawingScale, drawingScale);
+    context.lineTo(2 * drawingScale, 2 * drawingScale);
+    context.lineTo(drawingScale, 2 * drawingScale);
+    context.fill();
+    context.beginPath();
+    context.fillStyle = this.color3;
+    context.moveTo(0, drawingScale);
+    context.lineTo(drawingScale, drawingScale);
+    context.lineTo(drawingScale, 2 * drawingScale);
+    context.fill();
     // Restore the coordinate system.
-    this.context.restore();
+    context.restore();
   };
   this.sidebar = function(){
 
