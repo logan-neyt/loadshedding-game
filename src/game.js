@@ -15,25 +15,26 @@ function resizeCanvas(){
   /*
     Set the size of the canvas to maintain a constant aspect ratio.
    */
-  canvas.height = window.innerHeight * 2;
-  canvas.width = window.innerWidth * 2;
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
   canvasHeight = canvas.height; // Set the height of the canvas.
   canvasWidth = canvas.width; // Set the width of the canvas.
   drawingScale = canvasWidth / 384; // Set the distance between grid references.
-}
+};
 
 function getRandomInt(max) {
   /*
     Syntactic sugar for generating random integers.
   */
   return Math.floor(Math.random() * Math.floor(max));
-}
+};
 
 function endGame(day, time){
   /*
     Display the end game screen.
   */
   loop.stop()  // Stop the game loop.
+  canvas.removeEventListener("mousedown");
 };
 
 function defaultSidebar(){
@@ -43,6 +44,8 @@ function defaultSidebar(){
    */
   this.width = 70 * drawingScale
   this.color = "#0077c2";  // The primary color used in the sidebars.
+  this.color2 = "#0d47a1"; // The secondary color used in the sidebars.
+  this.color3 = "#0d47a1"; // The accent color used in the sidebars.
   this.textColor = "#fafafa"; // The color used for the text.
   this.selectionColor = "#ef5350"; // The color of the selection cursor.
 
@@ -77,7 +80,7 @@ function defaultSidebar(){
       };
     };
   };
-  this.render = function(){
+  this.render = function(){ // Draw the sidebar when nothing is selected(otherwise drawing is handled by the selected object).
     this.backdrop();
   };
   this.cursor = function(x, y, x2, y2){
@@ -107,9 +110,9 @@ function game(){
     Object to track and update the game's state.
   */
   this.context = context; // The context object to use for drawing.
-  this.color = "#0077c2";  // The primary color used in the GUI.
+  this.color = "#0d47a1";  // The primary color used in the GUI.
   this.textColor = "#fafafa"; // The color used for the text.
-  this.font = "px Nova Flat"; // The font used for the GUI (Scale will be provided when drawing.).
+  this.font = "px Nova Flat"; // The font used for the GUI (Scale will be provided when drawing).
 
   this.time = 9000;  // The time of day in the game.
   this.day = 1;   // How many in game days have elapsed.
@@ -185,7 +188,7 @@ function game(){
     };
   };
   this.backLayer = function (){ // Render the background for the map.
-    context.fillStyle = "green";
+    context.fillStyle = "#1b5e20";
     context.fillRect(0, 0, canvasWidth, canvasHeight);
   };
   this.gui = function (){  // Render the game's GUI.
@@ -218,7 +221,7 @@ function game(){
     context.fillStyle = this.textColor;
     context.fillText(this.friendlyTime() + "  Day " + this.day, -54 * drawingScale, 6 * drawingScale);
     context.restore();  // Restore the coordinate system.
-  }
+  };
 };
 
 function House(xPos, yPos){
@@ -272,6 +275,7 @@ function House(xPos, yPos){
     this.context.restore();
   };
   this.sidebar = function(){
+    defaultSidebar.backdrop();
 
   };
   this.onClick = function(){
@@ -498,12 +502,12 @@ function SolarPanel(xPos, yPos){
         this.generation = gameState.sunlight;
       }else{
         this.generation = gameState.sunlight / gameState.clouds;
-      }
+      };
     }else{
       this.generation = 0;
-    }
+    };
     gameState.generate(this.generation);  // Update the gameState's variables.
-  }
+  };
   this.render = function(){
     // Move the coordinate system.
     this.context.save()
@@ -528,7 +532,7 @@ function SolarPanel(xPos, yPos){
     this.context.moveTo(0, drawingScale);
     this.context.lineTo(drawingScale, drawingScale);
     this.context.lineTo(drawingScale, 2 * drawingScale);
-    this.context.fill()
+    this.context.fill();
     // Restore the coordinate system.
     this.context.restore();
   };
@@ -564,7 +568,7 @@ function newGame(){
         buildings[i].update();
       }
     },
-    render: function() {
+    render: function(){
       context.setTransform(1, 0, 0, 1, 0, 0); // Reset current transformation matrix to the identity matrix
       gameState.backLayer();  // Draw the background.
       for (var i = 0; i < buildingsLength; i++){  // Render all the building sprites.
@@ -595,7 +599,7 @@ function newGame(){
             return;
           };
         };
-        buildingSelected = false; // If nothing was clicked on deselect the current selection.
+        buildingSelected = false; // If nothing was clicked on, deselect the current selection.
       };
     };
   });
