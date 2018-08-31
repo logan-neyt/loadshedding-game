@@ -503,7 +503,7 @@ function newGame(){
       for (var i = 0; i < buildingsLength; i++){  // Render all the building sprites.
         buildings[i].render();
       };
-      if(buildingSelected != false){ // If there is a building selected
+      if(buildingSelected !== false){ // If there is a building selected
         buildings[buildingSelected].sidebar();  // Use that building's sidebar.
       }else{  // If there is no building selected
         defaultSidebar.render();  // Draw the default sidebar.
