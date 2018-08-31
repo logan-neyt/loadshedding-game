@@ -49,6 +49,20 @@ function defaultSidebar(){
   this.cursorAnimation = 0; // The frame the cursor animation is on.
   this.cursorExpanding = true;  // If the cursor is currently expanding or contracting.
 
+  this.backdrop = function(){
+    // Move the coordinate system.
+    context.save();
+    context.translate(0, 8 * drawingScale);
+    // Draw dackdrop.
+    context.fillStyle = this.color;
+    context.fillRect(0, 0, this.width, canvasHeight);
+    // Draw edge.
+    context.fillStyle = this.color2;
+    context.fillRect(this.width, 0, drawingScale / -2, canvasHeight);
+    // Restore the coordinate system.
+    context.restore();
+  };
+
   this.update = function(){
     // Advance the cursor animation.
     if(this.cursorExpanding == true){
@@ -64,14 +78,7 @@ function defaultSidebar(){
     };
   };
   this.render = function(){
-    // Move the coordinate system.
-    context.save();
-    context.translate(0, 8 * drawingScale);
-    // Draw dackdrop.
-    context.fillStyle = this.color;
-    context.fillRect(0, 0, this.width, canvasHeight);
-    // Restore the coordinate system.
-    context.restore();
+    this.backdrop();
   };
   this.cursor = function(x, y, x2, y2){
     // Calculate the size of the sprite in pixels.
