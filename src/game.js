@@ -36,6 +36,65 @@ function endGame(day, time){
   loop.stop()  // Stop the game loop.
 };
 
+function defaultSidebar(){
+  /*
+    Function to hold the default values and draw the sidebar when nothing is selected.
+    It also handles the selection cursor.
+   */
+  this.width = 70 * drawingScale
+  this.color = "#0077c2";  // The primary color used in the sidebars.
+  this.textColor = "#fafafa"; // The color used for the text.
+  this.selectionColor = "#ef5350"; // The color of the selection cursor.
+
+  this.cursorAnimation = 0; // The frame the cursor animation is on.
+  this.cursorExpanding = true;  // If the cursor is currently expanding or contracting.
+
+  this.update = function(){
+    // Advance the cursor animation.
+    if(this.cursorExpanding == true){
+      this.cursorAnimation = this.cursorAnimation + (drawingScale / 60);
+      if(this.cursorAnimation >= drawingScale/2){
+        this.cursorExpanding = false;
+      };
+    }else{
+      this.cursorAnimation = this.cursorAnimation - (drawingScale / 60);
+      if(this.cursorAnimation <= 0){
+        this.cursorExpanding = true;
+      };
+    };
+  };
+  this.render = function(){
+    // Move the coordinate system.
+    context.save();
+    context.translate(0, 8 * drawingScale);
+    // Draw dackdrop.
+    context.fillStyle = this.color;
+    context.fillRect(0, 0, this.width, canvasHeight);
+    // Restore the coordinate system.
+    context.restore();
+  };
+  this.cursor = function(x, y, x2, y2){
+    // Calculate the size of the sprite in pixels.
+    var dx = (x2 - x);
+    var dy = (y2 - y);
+    // Move the coordinate system.
+    context.save();
+    context.translate(x, y);
+    // Draw.
+    context.fillStyle = this.selectionColor;
+    context.fillRect(-drawingScale - this.cursorAnimation, -drawingScale - this.cursorAnimation, 2 * drawingScale, drawingScale / 2);
+    context.fillRect(-drawingScale - this.cursorAnimation, -drawingScale - this.cursorAnimation, drawingScale / 2, 2 * drawingScale);
+    context.fillRect(dx + drawingScale + this.cursorAnimation, -drawingScale - this.cursorAnimation, -2 * drawingScale, drawingScale / 2);
+    context.fillRect(dx + drawingScale + this.cursorAnimation, -drawingScale - this.cursorAnimation, drawingScale / -2, 2 * drawingScale);
+    context.fillRect(-drawingScale - this.cursorAnimation, dy + drawingScale + this.cursorAnimation, 2 * drawingScale, drawingScale / -2);
+    context.fillRect(-drawingScale - this.cursorAnimation, dy + drawingScale + this.cursorAnimation, drawingScale / 2, -2 * drawingScale);
+    context.fillRect(dx + drawingScale + this.cursorAnimation, dy + drawingScale + this.cursorAnimation, -2 * drawingScale, drawingScale / -2);
+    context.fillRect(dx + drawingScale + this.cursorAnimation, dy + drawingScale + this.cursorAnimation, drawingScale / -2, -2 * drawingScale);
+    // Restore the coordinate system.
+    context.restore();
+  };
+};
+
 function game(){
   /*
     Object to track and update the game's state.
@@ -493,6 +552,7 @@ function newGame(){
   loop = kontra.gameLoop({  // Create the kontra endless game loop.
     update: function(){
       gameState.update();
+      defaultSidebar.update();
       for (var i = 0; i < buildingsLength; i++){  // Update all the buildings in the array.
         buildings[i].update();
       }
@@ -504,6 +564,7 @@ function newGame(){
         buildings[i].render();
       };
       if(buildingSelected !== false){ // If there is a building selected
+        defaultSidebar.cursor(buildings[buildingSelected].x, buildings[buildingSelected].y, buildings[buildingSelected].x2, buildings[buildingSelected].y2);  // Draw the selection cursor.
         buildings[buildingSelected].sidebar();  // Use that building's sidebar.
       }else{  // If there is no building selected
         defaultSidebar.render();  // Draw the default sidebar.
@@ -515,8 +576,8 @@ function newGame(){
   canvas.addEventListener("mousedown", function(event){
     if (event.which == 1){
       console.log("Clicked (" + event.pageX + ", " + event.pageY + ")   (" + Math.round(event.pageX / drawingScale) + ", " + Math.round(event.pageY / drawingScale) + ")");
-      if(event.pageX > (70 * drawingScale)){
-        for(var i = 0; i < buildingsLength; i++){
+      if(event.pageX > defaultSidebar.width){ // If the event does not land on the sidebar.
+        for(var i = 0; i < buildingsLength; i++){ // Try to find a building that was clicked on.
           if(event.pageX >= buildings[i].x && event.pageX <= buildings[i].x2 && event.pageY >= buildings[i].y && event.pageY <= buildings[i].y2){
             buildings[i].onClick();
             if(buildingSelected == i){  // If the user clicked on the selected building
@@ -529,7 +590,6 @@ function newGame(){
         };
         buildingSelected = false; // If nothing was clicked on deselect the current selection.
       };
-      console.log(buildingSelected);
     };
   });
 
