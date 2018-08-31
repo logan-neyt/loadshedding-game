@@ -162,12 +162,14 @@ function House(xPos, yPos){
   this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
+  this.x2 = xPos + (8 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+  this.y2 = yPos + (6 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = ""; // Secondary color of the sprite.
   this.powered = true;  // If the building is active.
   this.consumption = 0;  // Amount of power the building is consuming.
 
-  this.color2Possibles = ["blue", "red", "lightgreen", "orange"];
+  this.color2Possibles = ["#3949ab", "#d32f2f", "#d4e157", "#c56000"];
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
 
   this.update = function (){  // Update the state of the object.
@@ -203,6 +205,12 @@ function House(xPos, yPos){
     // Restore the coordinate system.
     this.context.restore();
   };
+  this.sidebar = function(){
+
+  };
+  this.onClick = function(){
+
+  };
 };
 
 function Office(xPos, yPos){
@@ -212,6 +220,8 @@ function Office(xPos, yPos){
   this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
+  this.x2 = xPos + (13 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+  this.y2 = yPos + (12 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
   this.color = "grey";  // Primary color of the sprite.
   this.powered = true;  // If the building is active.
   this.consumption = 0;  // Amount of power the building is consuming.
@@ -248,6 +258,12 @@ function Office(xPos, yPos){
     // Restore the coordinate system.
     this.context.restore();
   };
+  this.sidebar = function(){
+
+  };
+  this.onClick = function(){
+
+  };
 };
 
 function Factory(xPos, yPos){
@@ -257,12 +273,14 @@ function Factory(xPos, yPos){
   this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
+  this.x2 = xPos + (12 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+  this.y2 = yPos + (10 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = ""; // Secondary color of the sprite.
   this.powered = true;  // If the building is powered
   this.consumption = 0;  // Amount of power the building is consuming.
 
-  this.color2Possibles = ["blue", "red", "lightgreen", "orange"];
+  this.color2Possibles = ["#3949ab", "#d32f2f", "#d4e157", "#c56000"];
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
 
   this.update = function(){
@@ -307,6 +325,12 @@ function Factory(xPos, yPos){
     // Restore the coordinate system.
     this.context.restore();
   };
+  this.sidebar = function(){
+
+  };
+  this.onClick = function(){
+
+  };
 };
 
 function WindTurbine(xPos, yPos){
@@ -316,6 +340,8 @@ function WindTurbine(xPos, yPos){
   this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
+  this.x2 = xPos + (5 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+  this.y2 = yPos + (9 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = "darkgrey"; // Secondary color of the sprite.
   this.frame = getRandomInt(8) * 15; // The animation frame the sprite is currently in.
@@ -376,6 +402,12 @@ function WindTurbine(xPos, yPos){
     // Restore the coordinate system.
     this.context.restore();
   };
+  this.sidebar = function(){
+
+  };
+  this.onClick = function(){
+
+  };
 };
 
 function SolarPanel(xPos, yPos){
@@ -385,6 +417,8 @@ function SolarPanel(xPos, yPos){
   this.context = context; // The context object to use for drawing.
   this.x = xPos;  // X coordinate of the sprite.
   this.y = yPos;  // Y coordinate of the sprite.
+  this.x2 = xPos + (2 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+  this.y2 = yPos + (3 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = "blue"; // Secondary color of the sprite.
   this.color3 = "lightblue"; // Third color for the sprite.
@@ -431,11 +465,18 @@ function SolarPanel(xPos, yPos){
     this.context.fill()
     // Restore the coordinate system.
     this.context.restore();
-  }
+  };
+  this.sidebar = function(){
+
+  };
+  this.onClick = function(){
+
+  };
 }
 
 function newGame(){
   gameState = new game(); // Create a new game() object.
+  defaultSidebar = new defaultSidebar();
   var buildings = [new Office(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
                    new Office(105 * drawingScale, 25  * drawingScale),
                    new House(80  * drawingScale, 50 * drawingScale),
@@ -447,6 +488,7 @@ function newGame(){
                    new SolarPanel(250 * drawingScale, 20 * drawingScale),
                    new Factory(80 * drawingScale, 100 * drawingScale)]
   var buildingsLength = buildings.length;
+  var buildingSelected = false; // The index of the building selected.
 
   loop = kontra.gameLoop({  // Create the kontra endless game loop.
     update: function(){
@@ -460,9 +502,35 @@ function newGame(){
       gameState.backLayer();  // Draw the background.
       for (var i = 0; i < buildingsLength; i++){  // Render all the building sprites.
         buildings[i].render();
-      }
+      };
+      if(buildingSelected != false){ // If there is a building selected
+        buildings[buildingSelected].sidebar();  // Use that building's sidebar.
+      }else{  // If there is no building selected
+        defaultSidebar.render();  // Draw the default sidebar.
+      };
       gameState.gui();  // Draw the game's GUI.
     }
+  });
+
+  canvas.addEventListener("mousedown", function(event){
+    if (event.which == 1){
+      console.log("Clicked (" + event.pageX + ", " + event.pageY + ")   (" + Math.round(event.pageX / drawingScale) + ", " + Math.round(event.pageY / drawingScale) + ")");
+      if(event.pageX > (70 * drawingScale)){
+        for(var i = 0; i < buildingsLength; i++){
+          if(event.pageX >= buildings[i].x && event.pageX <= buildings[i].x2 && event.pageY >= buildings[i].y && event.pageY <= buildings[i].y2){
+            buildings[i].onClick();
+            if(buildingSelected == i){  // If the user clicked on the selected building
+              buildingSelected = false; // Deselect the building.
+            }else{
+              buildingSelected = i; // Select the building.
+            };
+            return;
+          };
+        };
+        buildingSelected = false; // If nothing was clicked on deselect the current selection.
+      };
+      console.log(buildingSelected);
+    };
   });
 
   loop.start(); // Start game loop.
