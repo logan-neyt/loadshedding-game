@@ -541,6 +541,7 @@ function SolarPanel(xPos, yPos){
 function newGame(){
   gameState = new game(); // Create a new game() object.
   defaultSidebar = new defaultSidebar();
+  sidebarElements = []; // Array of interactive elements in the active sidebar. Used for click detection.
   var buildings = [new Office(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
                    new Office(105 * drawingScale, 25  * drawingScale),
                    new House(80  * drawingScale, 50 * drawingScale),
@@ -580,7 +581,7 @@ function newGame(){
 
   canvas.addEventListener("mousedown", function(event){
     if (event.which == 1){
-      console.log("Clicked (" + event.pageX + ", " + event.pageY + ")   (" + Math.round(event.pageX / drawingScale) + ", " + Math.round(event.pageY / drawingScale) + ")");
+      console.log("Clicked (" + event.pageX + ", " + event.pageY + ")   (" + Math.round(event.pageX / drawingScale) + ", " + Math.round(event.pageY / drawingScale) + ")"); // Temporary code to help me debug and place elements. Really kick me if I leave this in! :-P
       if(event.pageX > defaultSidebar.width){ // If the event does not land on the sidebar.
         for(var i = 0; i < buildingsLength; i++){ // Try to find a building that was clicked on.
           if(event.pageX >= buildings[i].x && event.pageX <= buildings[i].x2 && event.pageY >= buildings[i].y && event.pageY <= buildings[i].y2){
@@ -590,10 +591,18 @@ function newGame(){
             }else{
               buildingSelected = i; // Select the building.
             };
-            return;
+            return; // No need to keep looping.
           };
         };
         buildingSelected = false; // If nothing was clicked on, deselect the current selection.
+      }else{  // If the event does land on the sidebar
+        var sidebarElementsLength = sidebarElements.length;
+        for(var i = 0; i < sidebarElementsLength; i++){
+          if(event.pageX >= sidebarElements[i].x && event.pageX <= sidebarElements[i].x2 && event.pageY >= sidebarElements[i].y && event.pageY <= sidebarElements[i].y2){
+            sidebarElements[i].onClick();
+            return; // No need to keep looping.
+          };
+        };
       };
     };
   });
