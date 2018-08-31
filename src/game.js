@@ -585,7 +585,7 @@ function newGame(){
         for(var i = 0; i < buildingsLength; i++){ // Try to find a building that was clicked on.
           if(event.pageX >= buildings[i].x && event.pageX <= buildings[i].x2 && event.pageY >= buildings[i].y && event.pageY <= buildings[i].y2){
             buildings[i].onClick();
-            if(buildingSelected == i){  // If the user clicked on the selected building
+            if(buildingSelected === i){  // If the user clicked on the selected building
               buildingSelected = false; // Deselect the building.
             }else{
               buildingSelected = i; // Select the building.
