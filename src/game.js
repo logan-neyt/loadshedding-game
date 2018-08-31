@@ -134,7 +134,26 @@ function game(){
       this.mins = "0" + this.mins;
     }
     return this.hours + ":" + this.mins;
-  }
+  };
+  this.friendlyWeather = function(iWind, iClouds){  // Return a description of the input weather.
+    if(iWind < 2){
+      frWeather = "Calm";
+    }else if (iWind < 5) {
+      frWeather = "Breezy";
+    } else if (iWind < 7) {
+      frWeather = "Windy";
+    } else {
+      frWeather = "Gale";
+    };
+    if(iClouds > 7){
+      frWeather = frWeather + ", Overcast";
+    } else if (iClouds > 3) {
+      frWeather = frWeather + ", Cloudy";
+    } else{
+      frWeather = frWeather + ", Clear"
+    }
+    return frWeather;
+  };
 
   this.generate = function(power){ // Add to the powerGenerated tally.
     this.powerGenerated = this.powerGenerated + power;
@@ -167,22 +186,7 @@ function game(){
     if (this.weatherDelay <= 0){  // If the weather must be changed.
       this.wind = getRandomInt(11);
       this.clouds = getRandomInt(11);
-      if(this.wind < 2){
-        this.weather = "Calm";
-      }else if (this.wind < 5) {
-        this.weather = "Breezy";
-      } else if (this.wind < 7) {
-        this.weather = "Windy";
-      } else {
-        this.weather = "Gale";
-      }
-      if(this.clouds > 7){
-        this.weather = this.weather + ", Overcast";
-      } else if (this.clouds > 3) {
-        this.weather = this.weather + ", Cloudy";
-      } else{
-        this.weather = this.weather + ", Clear"
-      }
+      this.weather = this.friendlyWeather(this.wind, this.clouds);
       this.weatherDelay = getRandomInt(18000) + 360;
     };
   };
