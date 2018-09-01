@@ -630,16 +630,36 @@ function SolarPanel(xPos, yPos){
 function newGame(){
   gameState = new game(); // Create a new game() object.
   defaultSidebar = new defaultSidebar();
-  var buildings = [new Office(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
-                   new Office(105 * drawingScale, 25  * drawingScale),
-                   new House(80  * drawingScale, 50 * drawingScale),
-                   new House(92.5  * drawingScale, 50 * drawingScale),
-                   new House(105  * drawingScale, 50 * drawingScale),
-                   new WindTurbine(250 * drawingScale, 60 * drawingScale),
-                   new WindTurbine(230 * drawingScale, 60 * drawingScale),
-                   new WindTurbine(210 * drawingScale, 60 * drawingScale),
+  var buildings = [new WindTurbine(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
+                   new WindTurbine(90 * drawingScale, 25  * drawingScale),
+                   new WindTurbine(100 * drawingScale, 25 * drawingScale),
+                   new WindTurbine(85  * drawingScale, 35 * drawingScale),
+                   new WindTurbine(95  * drawingScale, 35 * drawingScale),
+                   new WindTurbine(105  * drawingScale, 35 * drawingScale),
+                   new House(200 * drawingScale, 40 * drawingScale),
+                   new House(210 * drawingScale, 40 * drawingScale),
+                   new House(220 * drawingScale, 40 * drawingScale),
+                   new House(230 * drawingScale, 40 * drawingScale),
+                   new House(200 * drawingScale, 50 * drawingScale),
+                   new House(210 * drawingScale, 50 * drawingScale),
+                   new House(220 * drawingScale, 50 * drawingScale),
+                   new House(230 * drawingScale, 50 * drawingScale),
+                   new House(240 * drawingScale, 45 * drawingScale),
+                   new Office(200 * drawingScale, 80 * drawingScale),
+                   new Office(215 * drawingScale, 80 * drawingScale),
+                   new Office(230 * drawingScale, 80 * drawingScale),
+                   new SolarPanel(227.5 * drawingScale, 15 * drawingScale),
+                   new SolarPanel(232.5 * drawingScale, 15 * drawingScale),
+                   new SolarPanel(237.5 * drawingScale, 15 * drawingScale),
+                   new SolarPanel(242.5 * drawingScale, 15 * drawingScale),
+                   new SolarPanel(247.5 * drawingScale, 15 * drawingScale),
+                   new SolarPanel(230 * drawingScale, 20 * drawingScale),
+                   new SolarPanel(235 * drawingScale, 20 * drawingScale),
+                   new SolarPanel(240 * drawingScale, 20 * drawingScale),
+                   new SolarPanel(245 * drawingScale, 20 * drawingScale),
                    new SolarPanel(250 * drawingScale, 20 * drawingScale),
-                   new Factory(80 * drawingScale, 100 * drawingScale)]
+                   new Factory(80 * drawingScale, 100 * drawingScale),
+                   new Factory(100 * drawingScale, 100 * drawingScale)]
   var buildingsLength = buildings.length;
   var buildingSelected = false; // The index of the building selected.
 
