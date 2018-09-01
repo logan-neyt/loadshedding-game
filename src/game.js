@@ -52,6 +52,7 @@ function defaultSidebar(){
 
   this.cursorAnimation = 0; // The frame the cursor animation is on.
   this.cursorExpanding = true;  // If the cursor is currently expanding or contracting.
+  this.elements = []; // Array of interactive elements in the active sidebar. Used for click detection.
 
   this.backdrop = function(){
     // Move the coordinate system.
@@ -629,7 +630,6 @@ function SolarPanel(xPos, yPos){
 function newGame(){
   gameState = new game(); // Create a new game() object.
   defaultSidebar = new defaultSidebar();
-  sidebarElements = []; // Array of interactive elements in the active sidebar. Used for click detection.
   var buildings = [new Office(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
                    new Office(105 * drawingScale, 25  * drawingScale),
                    new House(80  * drawingScale, 50 * drawingScale),
@@ -684,10 +684,10 @@ function newGame(){
         };
         buildingSelected = false; // If nothing was clicked on, deselect the current selection.
       }else{  // If the event does land on the sidebar
-        var sidebarElementsLength = sidebarElements.length;
+        var sidebarElementsLength = defaultSidebar.elements.length;
         for(var i = 0; i < sidebarElementsLength; i++){
-          if(event.pageX >= sidebarElements[i].x && event.pageX <= sidebarElements[i].x2 && event.pageY >= sidebarElements[i].y && event.pageY <= sidebarElements[i].y2){
-            sidebarElements[i].onClick();
+          if(event.pageX >= defaultSidebar.elements[i].x && event.pageX <= defaultSidebar.elements[i].x2 && event.pageY >= defaultSidebar.elements[i].y && event.pageY <= defaultSidebar.elements[i].y2){
+            defaultSidebar.elements[i].onClick();
             return; // No need to keep looping.
           };
         };
