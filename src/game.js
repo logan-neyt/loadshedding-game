@@ -386,6 +386,13 @@ function Office(xPos, yPos){
     defaultSidebar.backdrop();
 
   };
+  this.togglePwd = function(){
+    if(this.powered){
+      this.powered = false;
+    }else{
+      this.powered = true;
+    };
+  };
   this.onClick = function(){
 
   };
@@ -452,6 +459,13 @@ function Factory(xPos, yPos){
   this.sidebar = function(){
     defaultSidebar.backdrop();
 
+  };
+  this.togglePwd = function(){
+    if(this.powered){
+      this.powered = false;
+    }else{
+      this.powered = true;
+    };
   };
   this.onClick = function(){
 
@@ -530,6 +544,13 @@ function WindTurbine(xPos, yPos){
     defaultSidebar.backdrop();
 
   };
+  this.togglePwd = function(){
+    if(this.powered){
+      this.powered = false;
+    }else{
+      this.powered = true;
+    };
+  };
   this.onClick = function(){
 
   };
@@ -593,6 +614,12 @@ function SolarPanel(xPos, yPos){
   this.sidebar = function(){
     defaultSidebar.backdrop();
     
+  this.togglePwd = function(){
+    if(this.powered){
+      this.powered = false;
+    }else{
+      this.powered = true;
+    };
   };
   this.onClick = function(){
 
