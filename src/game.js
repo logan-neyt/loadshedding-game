@@ -97,10 +97,10 @@ function defaultSidebar(){
     context.fillText("Score", 2 * drawingScale, 6 * drawingScale)
     context.fillText(Math.floor(gameState.score) + " kWH", 7 * drawingScale, 12 * drawingScale);
     context.fillText("Weather Forecast", 2 * drawingScale, 20 * drawingScale);
-    context.fillText("1hr - ", 7 * drawingScale, 26 * drawingScale);
-    context.fillText("2hr - ", 7 * drawingScale, 32 * drawingScale);
-    context.fillText("5hr - ", 7 * drawingScale, 38 * drawingScale);
-    context.fillText("12hr - ", 4 * drawingScale, 44 * drawingScale);
+    context.fillText("1hr - " + gameState.weatherAtTime(750), 7 * drawingScale, 26 * drawingScale);
+    context.fillText("2hr - " + gameState.weatherAtTime(1500), 7 * drawingScale, 32 * drawingScale);
+    context.fillText("5hr - " + gameState.weatherAtTime(3750), 7 * drawingScale, 38 * drawingScale);
+    context.fillText("12hr - " + gameState.weatherAtTime(9000), 4 * drawingScale, 44 * drawingScale);
     // Restore the coordinate system.
     context.restore();
   };
@@ -138,10 +138,11 @@ function game(){
   this.time = 9000;  // The time of day in the game.
   this.day = 1;   // How many in game days have elapsed.
   this.sunlight = 10; // Brightness of the sun(dependent on time, independent of cloud cover).
-  this.weather = ""; // The in game weather state.
+  this.weather = ""; // Description of the in game weather state.
   this.wind = 0;  // The amount of wind.
   this.clouds = 0;  // Density of cloud cover.
   this.weatherDelay = 0;  // How many cycles before the weather changes. Stops the weather from changing every cycle.
+  this.futureWeather = [[0, 0, "", 0], [0, 0, "", 0]];  // Array to hold at least 12hrs worth of pre-generated weather. Required for the weather forecast.
   this.powerGenerated = 1; // How much power is being generated.
   this.powerConsumed = 0; // How much power is being consumed.
   this.gridFail = 300;  // Counts down to fail if the amount of power being consumend exceded the power being generated.
@@ -176,6 +177,27 @@ function game(){
     }
     return frWeather;
   };
+  this.weatherAtTime = function(cycles){  // Return the description of the weather at the cycle provided.
+    var duration = this.weatherDelay;
+    if(duration >= cycles){
+      return this.weather;
+    };
+    var futureWeatherLength = this.futureWeather.length;
+    for(var i = 0; i < futureWeatherLength; i++){
+      duration = duration + this.futureWeather[i][3];
+      if(duration >= cycles){
+        return this.futureWeather[i][2];
+      };
+    };
+  };
+  this.futureWeatherDuration = function(){  // Find how many cycles worth of weather are stored in futureWeather[].
+    var duration = 0;
+    var futureWeatherLength = this.futureWeather.length;
+    for(var i = 0; i < futureWeatherLength; i++){
+      duration = duration + this.futureWeather[i][3];
+    };
+    return duration;
+  };
 
   this.generate = function(power){ // Add to the powerGenerated tally.
     this.powerGenerated = this.powerGenerated + power;
@@ -206,11 +228,19 @@ function game(){
     this.powerConsumed = 0;
     // Update the weather.
     this.weatherDelay--;
+    // Generate new weather.
+    while(this.futureWeatherDuration() < 9000){ // If there is less than 12hrs of weather pre-generated
+      var newWind = getRandomInt(11);
+      var newClouds = getRandomInt(11)
+      this.futureWeather.push([newWind, newClouds, this.friendlyWeather(newWind, newClouds), getRandomInt(18000) + 360]);
+    };
     if (this.weatherDelay <= 0){  // If the weather must be changed.
-      this.wind = getRandomInt(11);
-      this.clouds = getRandomInt(11);
-      this.weather = this.friendlyWeather(this.wind, this.clouds);
-      this.weatherDelay = getRandomInt(18000) + 360;
+      // Get the next weather.
+      this.wind = this.futureWeather[0][0];
+      this.clouds = this.futureWeather[0][1];
+      this.weather = this.futureWeather[0][2];
+      this.weatherDelay = this.futureWeather[0][3];
+      this.futureWeather.shift();
     };
   };
   this.backLayer = function (){ // Render the background for the map.
