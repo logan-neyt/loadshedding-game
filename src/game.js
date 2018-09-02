@@ -42,27 +42,25 @@ function defaultSidebar(){
     Function to hold the default values and draw the sidebar when nothing is selected.
     It also handles the selection cursor.
    */
-  this.width = 70 * drawingScale
+  this.width = 70 * drawingScale;
   this.color = "#0077c2";  // The primary color used in the sidebars.
   this.color2 = "#0d47a1"; // The secondary color used in the sidebars.
   this.color3 = "#0d47a1"; // The accent color used in the sidebars.
   this.textColor = "#fafafa"; // The color used for the text.
   this.font = "px Nova Flat"; // The font used for the sidebars (Scale will be provided when drawing).
   this.selectionColor = "#ef5350"; // The color of the selection cursor.
-  this.spriteX = 9 * drawingScale;  // X coordinate to draw the building sprite on the sidebar.
-  this.spriteY = 30 * drawingScale; // X coordinate to draw the building sprite on the sidebar.
 
   this.cursorAnimation = 0; // The frame the cursor animation is on.
   this.cursorExpanding = true;  // If the cursor is currently expanding or contracting.
   this.elements = []; // Array of interactive elements in the active sidebar. Used for click detection.
 
-  this.relScale = function(x, y, x2, y2){ // Function to get a relative scale for drawing a sprite on the sidebar.
-    var sizeX = (x2 - x) / drawingScale;
-    var sizeY = (y2 - y) / drawingScale;
+  this.relScale = function(x, y, x2, y2){ // Function to get a relative scale and coordinates for drawing a sprite on the sidebar.
+    var sizeX = (x2 - x);
+    var sizeY = (y2 - y);
     if (sizeX >= sizeY){
-      return (51 * drawingScale) / sizeX;
+      return [9 * drawingScale, (30 * drawingScale) + ((sizeX - sizeY) / 2) * drawingScale, (51 * drawingScale * drawingScale) / sizeX];
     }else{
-      return (48 * drawingScale) / sizeY;
+      return [(9 * drawingScale) + ((sizeY - sizeX) / 2) * drawingScale, 30 * drawingScale, (48 * drawingScale * drawingScale) / sizeY];
     };
   };
   this.backdrop = function(){
@@ -78,7 +76,7 @@ function defaultSidebar(){
     // Restore the coordinate system.
     context.restore();
   };
-  this.building = function(name){  // Draw the default sidebar for when buildings are selected.
+  this.building = function(name, active, generation, consumption){  // Draw the default sidebar for when buildings are selected.
     this.backdrop();
     // Move the coordinate system.
     context.save();
@@ -94,6 +92,14 @@ function defaultSidebar(){
     context.fillRect(5.5 * drawingScale, 18.5 * drawingScale, this.width - (12 * drawingScale), 55 * drawingScale);
     context.fillStyle = "#d0d0d0";
     context.fillRect(6 * drawingScale, 19 * drawingScale, this.width - (13 * drawingScale), 54 * drawingScale);
+    // Draw stats box.
+    context.fillStyle = this.color3;
+    context.fillRect(drawingScale, 78 * drawingScale, this.width - (3 * drawingScale), 40 * drawingScale);
+    context.fillStyle = this.textColor;
+    context.fillText("Stats:", 2 * drawingScale, 83 * drawingScale);
+    context.fillText("Active:         " + active, 7 * drawingScale, 89 * drawingScale);
+    context.fillText("Generating:  " + (Math.floor(generation * 10) / 10), 7 * drawingScale, 95 * drawingScale);
+    context.fillText("Consuming: " + (Math.floor(consumption * 10) / 10), 7 * drawingScale, 101 * drawingScale);
     // Restore the coordinate system.
     context.restore();
   };
@@ -364,8 +370,9 @@ function House(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("House");
-    this.sprite(defaultSidebar.spriteX, defaultSidebar.spriteY, defaultSidebar.relScale(this.x, this.y, this.x2, this.y2));
+    defaultSidebar.building("House", this.powered, 0, this.consumption);
+    var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
+    this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
   this.togglePwd = function(){
     if(this.powered){
@@ -427,8 +434,9 @@ function Office(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Office");
-    this.sprite(defaultSidebar.spriteX, defaultSidebar.spriteY, defaultSidebar.relScale(this.x, this.y, this.x2, this.y2));
+    defaultSidebar.building("Office", this.powered, 0, this.consumption);
+    var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
+    this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
   this.togglePwd = function(){
     if(this.powered){
@@ -504,8 +512,9 @@ function Factory(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Factory");
-    this.sprite(defaultSidebar.spriteX, defaultSidebar.spriteY, defaultSidebar.relScale(this.x, this.y, this.x2, this.y2));
+    defaultSidebar.building("Factory", this.powered, 0, this.consumption);
+    var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
+    this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
   this.togglePwd = function(){
     if(this.powered){
@@ -591,8 +600,9 @@ function WindTurbine(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Wind Turbine");
-    this.sprite(defaultSidebar.spriteX, defaultSidebar.spriteY, defaultSidebar.relScale(this.x, this.y, this.x2, this.y2));
+    defaultSidebar.building("Wind Turbine", this.powered, this.generation, 0);
+    var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
+    this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
   this.togglePwd = function(){
     if(this.powered){
@@ -665,8 +675,9 @@ function SolarPanel(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Solar Panel");
-    this.sprite(defaultSidebar.spriteX, defaultSidebar.spriteY, defaultSidebar.relScale(this.x, this.y, this.x2, this.y2));
+    defaultSidebar.building("Solar Panel", this.powered, this.generation, 0);
+    var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
+    this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
   this.togglePwd = function(){
     if(this.powered){
