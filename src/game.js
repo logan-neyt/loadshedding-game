@@ -37,6 +37,29 @@ function endGame(day, time){
   canvas.removeEventListener("mousedown");
 };
 
+function Element(){
+  /*
+    Function to handle clickable elements on the GUI.
+   */
+  this.function = function(){}; // Function to run if the element is clicked.
+  this.set = function(x, y, x2, y2){
+    this.x = x; // Top of the element.
+    this.y = y; // Top of the element.
+    this.x2 = x2; // Top of the element.
+    this.y2 = y2; // Top of the element.
+    this.active = true;
+  };
+  this.clear = function(){
+    this.active = false;
+  };
+  this.onClick = function(){
+    this.function();
+  };
+
+  this.set(-1, -1, -1, -1, "");
+  this.clear();
+};
+
 function defaultSidebar(){
   /*
     Function to hold the default values and draw the sidebar when nothing is selected.
@@ -46,13 +69,17 @@ function defaultSidebar(){
   this.color = "#0077c2";  // The primary color used in the sidebars.
   this.color2 = "#0d47a1"; // The secondary color used in the sidebars.
   this.color3 = "#0d47a1"; // The accent color used in the sidebars.
+  this.buttonColor = "#00bcd4"; // The primary color used for buttons.
+  this.buttonColor2 = "#008ba3";  // The accent color used for buttons.
+  this.buttonColor3 = "#e0f7fa"; // The color used when the button has been pressed.
   this.textColor = "#fafafa"; // The color used for the text.
   this.font = "px Nova Flat"; // The font used for the sidebars (Scale will be provided when drawing).
   this.selectionColor = "#ef5350"; // The color of the selection cursor.
 
+  this.buttonAnimation = 0; // The frame the button animation is on.
   this.cursorAnimation = 0; // The frame the cursor animation is on.
   this.cursorExpanding = true;  // If the cursor is currently expanding or contracting.
-  this.elements = []; // Array of interactive elements in the active sidebar. Used for click detection.
+  this.elements = [new Element()]; // Array of interactive elements in the active sidebar. Used for click detection.
 
   this.relScale = function(x, y, x2, y2){ // Function to get a relative scale and coordinates for drawing a sprite on the sidebar.
     var sizeX = (x2 - x);
@@ -76,7 +103,7 @@ function defaultSidebar(){
     // Restore the coordinate system.
     context.restore();
   };
-  this.building = function(name, active, generation, consumption){  // Draw the default sidebar for when buildings are selected.
+  this.building = function(name, active, generation, consumption){  // Draw the default sidebar for when gameState.buildings are selected.
     this.backdrop();
     // Move the coordinate system.
     context.save();
@@ -97,14 +124,42 @@ function defaultSidebar(){
     context.fillRect(drawingScale, 78 * drawingScale, this.width - (3 * drawingScale), 40 * drawingScale);
     context.fillStyle = this.textColor;
     context.fillText("Stats:", 2 * drawingScale, 83 * drawingScale);
-    context.fillText("Active:         " + active, 7 * drawingScale, 89 * drawingScale);
+    if(active){
+      var status = "Online";
+    }else{
+      var status = "Offline";
+    };
+    context.fillText("Status:         " + status, 7 * drawingScale, 89 * drawingScale);
     context.fillText("Generating:  " + (Math.floor(generation * 10) / 10), 7 * drawingScale, 95 * drawingScale);
     context.fillText("Consuming: " + (Math.floor(consumption * 10) / 10), 7 * drawingScale, 101 * drawingScale);
+    // Draw buttons.
+    context.fillStyle = this.buttonColor2;
+    context.fillRect(15 * drawingScale, 122 * drawingScale, this.width - (34.5 * drawingScale), 10.5 * drawingScale);
+    if(this.buttonAnimation > 0){
+      this.buttonAnimation--;
+      context.fillStyle = this.buttonColor3;
+    }else{
+      context.fillStyle = this.buttonColor;
+    };
+    context.fillRect(15 * drawingScale, 122 * drawingScale, this.width - (35 * drawingScale), 10 * drawingScale);
+    context.font = Math.round(6 * drawingScale) + this.font;
+    context.fillStyle = this.buttonColor3;
+    context.fillText("SWITCH", 21 * drawingScale, 129 * drawingScale);
     // Restore the coordinate system.
     context.restore();
   };
 
   this.update = function(){
+    // Update elements.
+    if(gameState.buildingSelected === false){
+      this.elements[0].clear();
+    }else{
+      this.elements[0].set(15 * drawingScale, 130 * drawingScale, this.width - (20 * drawingScale), 140 * drawingScale);
+      this.elements[0].function = function(){
+        gameState.buildings[gameState.buildingSelected].togglePwd();
+        defaultSidebar.buttonAnimation = 5;
+      }
+    };
     // Advance the cursor animation.
     if(this.cursorExpanding == true){
       this.cursorAnimation = this.cursorAnimation + (drawingScale / 60);
@@ -171,6 +226,8 @@ function game(){
   this.textColor = "#fafafa"; // The color used for the text.
   this.font = "px Nova Flat"; // The font used for the GUI (Scale will be provided when drawing).
 
+  this.buildings = [];  // Array of buildings in the game.
+  this.buildingSelected = false; // The index of the building selected.
   this.score = 0; // The player's score.
   this.time = 9000;  // The time of day in the game.
   this.day = 1;   // How many in game days have elapsed.
@@ -694,7 +751,7 @@ function SolarPanel(xPos, yPos){
 function newGame(){
   gameState = new game(); // Create a new game() object.
   defaultSidebar = new defaultSidebar();
-  var buildings = [new WindTurbine(80 * drawingScale, 25  * drawingScale),  // Create an array with all the buildings in it.
+  gameState.buildings = [new WindTurbine(80 * drawingScale, 25  * drawingScale),  // Create an array with all the gameState.buildings in it.
                    new WindTurbine(90 * drawingScale, 25  * drawingScale),
                    new WindTurbine(100 * drawingScale, 25 * drawingScale),
                    new WindTurbine(85  * drawingScale, 35 * drawingScale),
@@ -724,26 +781,25 @@ function newGame(){
                    new SolarPanel(250 * drawingScale, 20 * drawingScale),
                    new Factory(80 * drawingScale, 100 * drawingScale),
                    new Factory(100 * drawingScale, 100 * drawingScale)]
-  var buildingsLength = buildings.length;
-  var buildingSelected = false; // The index of the building selected.
+  var buildingsLength = gameState.buildings.length;
 
   loop = kontra.gameLoop({  // Create the kontra endless game loop.
     update: function(){
       gameState.update();
       defaultSidebar.update();
-      for (var i = 0; i < buildingsLength; i++){  // Update all the buildings in the array.
-        buildings[i].update();
+      for (var i = 0; i < buildingsLength; i++){  // Update all the gameState.buildings in the array.
+        gameState.buildings[i].update();
       }
     },
     render: function(){
       context.setTransform(1, 0, 0, 1, 0, 0); // Reset current transformation matrix to the identity matrix
       gameState.backLayer();  // Draw the background.
       for (var i = 0; i < buildingsLength; i++){  // Render all the building sprites.
-        buildings[i].render();
+        gameState.buildings[i].render();
       };
-      if(buildingSelected !== false){ // If there is a building selected
-        defaultSidebar.cursor(buildings[buildingSelected].x, buildings[buildingSelected].y, buildings[buildingSelected].x2, buildings[buildingSelected].y2);  // Draw the selection cursor.
-        buildings[buildingSelected].sidebar();  // Use that building's sidebar.
+      if(gameState.buildingSelected !== false){ // If there is a building selected
+        defaultSidebar.cursor(gameState.buildings[gameState.buildingSelected].x, gameState.buildings[gameState.buildingSelected].y, gameState.buildings[gameState.buildingSelected].x2, gameState.buildings[gameState.buildingSelected].y2);  // Draw the selection cursor.
+        gameState.buildings[gameState.buildingSelected].sidebar();  // Use that building's sidebar.
       }else{  // If there is no building selected
         defaultSidebar.render();  // Draw the default sidebar.
       };
@@ -756,17 +812,19 @@ function newGame(){
       console.log("Clicked (" + event.pageX + ", " + event.pageY + ")   (" + Math.round(event.pageX / drawingScale) + ", " + Math.round(event.pageY / drawingScale) + ")"); // Temporary code to help me debug and place elements. Really kick me if I leave this in! :-P
       if(event.pageX > defaultSidebar.width){ // If the event does not land on the sidebar.
         for(var i = 0; i < buildingsLength; i++){ // Try to find a building that was clicked on.
-          if(event.pageX >= buildings[i].x && event.pageX <= buildings[i].x2 && event.pageY >= buildings[i].y && event.pageY <= buildings[i].y2){
-            buildings[i].onClick();
-            if(buildingSelected === i){  // If the user clicked on the selected building
-              buildingSelected = false; // Deselect the building.
+          if(event.pageX >= gameState.buildings[i].x && event.pageX <= gameState.buildings[i].x2 && event.pageY >= gameState.buildings[i].y && event.pageY <= gameState.buildings[i].y2){
+            gameState.buildings[i].onClick();
+            if(gameState.buildingSelected === i){  // If the user clicked on the selected building
+              gameState.buildingSelected = false; // Deselect the building.
+              defaultSidebar.elements[0].empty();
             }else{
-              buildingSelected = i; // Select the building.
+              gameState.buildingSelected = i; // Select the building.
+
             };
             return; // No need to keep looping.
           };
         };
-        buildingSelected = false; // If nothing was clicked on, deselect the current selection.
+        gameState.buildingSelected = false; // If nothing was clicked on, deselect the current selection.
       }else{  // If the event does land on the sidebar
         var sidebarElementsLength = defaultSidebar.elements.length;
         for(var i = 0; i < sidebarElementsLength; i++){
