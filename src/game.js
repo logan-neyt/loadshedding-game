@@ -236,7 +236,7 @@ function game(){
   this.wind = 0;  // The amount of wind.
   this.clouds = 0;  // Density of cloud cover.
   this.weatherDelay = 0;  // How many cycles before the weather changes. Stops the weather from changing every cycle.
-  this.futureWeather = [[0, 0, "", 0], [0, 0, "", 0]];  // Array to hold at least 12hrs worth of pre-generated weather. Required for the weather forecast.
+  this.futureWeather = [[7, 2, "Windy, Clear", 1800]];  // Array to hold at least 12hrs worth of pre-generated weather. Required for the weather forecast.
   this.powerGenerated = 1; // How much power is being generated.
   this.powerConsumed = 0; // How much power is being consumed.
   this.gridFail = 300;  // Counts down to fail if the amount of power being consumend exceded the power being generated.
@@ -385,13 +385,33 @@ function House(xPos, yPos){
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = ""; // Secondary color of the sprite.
   this.powered = true;  // If the building is active.
+  this.lights = [false, 0, 9002];  // If the window should be lit, when it should be lit and when it should turn off.
   this.consumption = 0;  // Amount of power the building is consuming.
 
   this.color2Possibles = ["#3949ab", "#d32f2f", "#d4e157", "#c56000"];
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
 
   this.update = function (){  // Update the state of the object.
-    gameState.consume(this.consumption);  // Update the gameState's variables.
+    // Check if the lights should be on.
+    if(gameState.time == this.lights[1]){ // If it is time to turn on the lights
+      this.lights[0] = true;  // Turn on the light.
+    };
+    if(gameState.time == this.lights[2]){ // If it is time to turn off the lights.
+      this.lights[0] = false; // Turn off the light.
+      this.lights[1] = getRandomInt(1500) + 13500;  // Set tommorrow's turn on time.
+      this.lights[2] = getRandomInt(3000) + 3000; // Set tommorrow's turn off time.
+    };
+    // Calculate the consumption.
+    if(this.powered){
+      this.consumption = 2; // Base consumption.
+      if(this.lights[0]){ // If the light is on
+        this.consumption = this.consumption + 1;
+      };
+      gameState.consume(this.consumption);  // Update the gameState's variables.
+    }else{
+      this.consumption = 0;
+    };
+
   };
   this.render = function (){
     this.sprite(this.x, this.y, drawingScale);
@@ -414,7 +434,7 @@ function House(xPos, yPos){
     context.fillStyle = this.color;
     context.fillRect(0, 2 * scale, 8 * scale, 4 * scale);
     // Draw window.
-    if((gameState.time >= 13500 || gameState.time <= 4875) && this.powered){  // Check if the lights should be on or off.
+    if(this.lights[0] && this.powered){  // Check if the lights should be on or off.
       context.fillStyle = "#ffff8b";
     } else {
       context.fillStyle = "#000000";
@@ -453,10 +473,38 @@ function Office(xPos, yPos){
   this.y2 = yPos + (12 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
   this.color = "grey";  // Primary color of the sprite.
   this.powered = true;  // If the building is active.
+  this.lights = [[false, 0, 9002]]  // If the window should be lit, when it should be lit and when it should turn off.
   this.consumption = 0;  // Amount of power the building is consuming.
 
+  for(var i = 0; i < 9; i++){ // Populate the windows array.
+    this.lights.push([false, 0, 9002])
+  };
+
   this.update = function (){  // Update the state of the object.
-    gameState.consume(this.consumption);  // Update the gameState's variables.
+    // Check if the lights should be on.
+    var lightsLength = this.lights.length;
+    for(var i = 0; i < lightsLength; i++){
+      if(gameState.time == this.lights[i][1]){ // If it is time to turn on the lights
+        this.lights[i][0] = true;  // Turn on the light.
+      };
+      if(gameState.time == this.lights[i][2]){ // If it is time to turn off the lights.
+        this.lights[i][0] = false; // Turn off the light.
+        this.lights[i][1] = getRandomInt(1500) + 13500;  // Set tommorrow's turn on time.
+        this.lights[i][2] = getRandomInt(3000) + 3000; // Set tommorrow's turn off time.
+      };
+    };
+    // Calculate the consumption.
+    if(this.powered){
+      this.consumption = 2; // Base consumption.
+      for(var i = 0; i < lightsLength; i++){
+        if(this.lights[i][0]){ // If the light is on
+          this.consumption = this.consumption + 0.5;
+        };
+      };
+      gameState.consume(this.consumption);  // Update the gameState's variables.
+    }else{
+      this.consumption = 0;
+    };
   };
   this.render = function(){
     this.sprite(this.x, this.y, drawingScale);
@@ -469,21 +517,31 @@ function Office(xPos, yPos){
     context.fillStyle = this.color;
     context.fillRect(0, 0, 13 * scale, 12 * scale);
     // Draw windows.
-    if((gameState.time >= 13500 || gameState.time <= 4875) && this.powered){  // Check if the lights should be on or off.
+    var windows = [[scale, scale, 2 * scale, 2 * scale],
+                   [4 * scale, scale, 2 * scale, 2 * scale],
+                   [7 * scale, scale, 2 * scale, 2 * scale],
+                   [10 * scale, scale, 2 * scale, 2 * scale],
+                   [scale, (5 * scale), 2 * scale, 2 * scale],
+                   [4 * scale, 5 * scale, 2 * scale, 2 * scale],
+                   [7 * scale, 5 * scale, 2 * scale, 2 * scale],
+                   [10 * scale, 5 * scale, 2 * scale, 2 * scale],
+                   [scale, 9 * scale, 2 * scale, 2 * scale],
+                   [10 * scale, 9 * scale, 2 * scale, 2 * scale]]
+    var lightsLength = this.lights.length;
+    if(this.powered){
       context.fillStyle = "#ffff8b";
-    } else {
-      context.fillStyle = "#000000";
+      for(var i = 0; i < lightsLength; i++){
+        if(this.lights[i][0]){  // Check if the lights should be on or off.
+          context.fillRect(windows[i][0], windows[i][1], windows[i][2], windows[i][3]);
+        };
+      };
     };
-    context.fillRect(scale, scale, 2 * scale, 2 * scale);
-    context.fillRect(4 * scale, scale, 2 * scale, 2 * scale);
-    context.fillRect(7 * scale, scale, 2 * scale, 2 * scale);
-    context.fillRect(10 * scale, scale, 2 * scale, 2 * scale);
-    context.fillRect(scale, (5 * scale), 2 * scale, 2 * scale);
-    context.fillRect(4 * scale, 5 * scale, 2 * scale, 2 * scale);
-    context.fillRect(7 * scale, 5 * scale, 2 * scale, 2 * scale);
-    context.fillRect(10 * scale, 5 * scale, 2 * scale, 2 * scale);
-    context.fillRect(scale, 9 * scale, 2 * scale, 2 * scale);
-    context.fillRect(10 * scale, 9 * scale, 2 * scale, 2 * scale);
+    context.fillStyle = "#000000";
+    for(var i =0; i < lightsLength; i++){
+      if(!(this.powered) || !(this.lights[i][0])){
+        context.fillRect(windows[i][0], windows[i][1], windows[i][2], windows[i][3]);
+      };
+    };
     // Draw door.
     context.fillStyle = "#000000";
     context.fillRect(5 * scale, 8 * scale, 3 * scale, 4 * scale);
@@ -524,7 +582,12 @@ function Factory(xPos, yPos){
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
 
   this.update = function(){
-    //gameState.consume(this.consumption);  // Update the gameState's variables.
+    if(this.powered){
+      this.consumption = 30;
+      gameState.consume(this.consumption);  // Update the gameState's variables.
+    }else{
+      this.consumption = 0;
+    };
   };
   this.render = function(){
     this.sprite(this.x, this.y, drawingScale);
