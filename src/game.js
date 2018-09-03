@@ -117,7 +117,7 @@ function defaultSidebar(){
     // Draw sprite box.
     context.fillStyle = "#909090";
     context.fillRect(5.5 * drawingScale, 18.5 * drawingScale, this.width - (12 * drawingScale), 55 * drawingScale);
-    context.fillStyle = "#d0d0d0";
+    context.fillStyle = gameState.backgroundColor;
     context.fillRect(6 * drawingScale, 19 * drawingScale, this.width - (13 * drawingScale), 54 * drawingScale);
     // Draw stats box.
     context.fillStyle = this.color3;
@@ -314,10 +314,10 @@ function game(){
                  [4501, 5250,"#279931", 8],
                  [5251, 6000,"#2aa835", 9],
                  [6001, 12000,"#4bbf4d", 10],
-                 [12001, 12750,"#2aa835", 9],
-                 [12751, 13500,"#279931", 8],
-                 [13501, 14250,"#1f7827", 6],
-                 [14251, 15000,"#154f1a", 3],
+                 [12001, 12750,"#2aa835", 8],
+                 [12751, 13500,"#279931", 6],
+                 [13501, 14250,"#1f7827", 4],
+                 [14251, 15000,"#154f1a", 2],
                  [15001, 18000,"#0d3010", 0]];
     timesLength = times.length;
     for(var i = 0; i < timesLength; i++){
