@@ -373,8 +373,13 @@ function game(){
     context.lineTo(0, 0);
     context.fill();
     context.font = Math.round(6 * drawingScale) + this.font;
+    if(this.powerGenerated <= this.powerConsumed){  // If the grid is overloaded.
+      context.fillStyle = "#e53935";
+    }else{
+      context.fillStyle = this.textColor;
+    };
+    context.fillText(Math.floor(this.powerGenerated) + " / "+ Math.floor(this.powerConsumed) + "  " + Math.floor((this.powerConsumed / this.powerGenerated) * 100) + "%", 5 * drawingScale, 6 * drawingScale);
     context.fillStyle = this.textColor;
-    context.fillText(Math.floor(this.powerGenerated) + " / "+ Math.floor(this.powerConsumed), 30 * drawingScale, 6 * drawingScale);
     context.fillText(this.weather, 58 * drawingScale, 6 * drawingScale);
     // Clock and date.
     context.save()
