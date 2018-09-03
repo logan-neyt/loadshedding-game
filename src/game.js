@@ -231,6 +231,7 @@ function game(){
   this.score = 0; // The player's score.
   this.time = 9000;  // The time of day in the game.
   this.day = 1;   // How many in game days have elapsed.
+  this.backgroundColor = "";  // The color of the grass background.
   this.sunlight = 10; // Brightness of the sun(dependent on time, independent of cloud cover).
   this.weather = ""; // Description of the in game weather state.
   this.wind = 0;  // The amount of wind.
@@ -307,6 +308,25 @@ function game(){
       this.day++;
       this.time = this.time - 18000;
     };
+    var times = [[0, 3000,"#0d3010", 0],
+                 [3001, 3750,"#154f1a", 3],
+                 [3751, 4500,"#1f7827", 6],
+                 [4501, 5250,"#279931", 8],
+                 [5251, 6000,"#2aa835", 9],
+                 [6001, 12000,"#4bbf4d", 10],
+                 [12001, 12750,"#2aa835", 9],
+                 [12751, 13500,"#279931", 8],
+                 [13501, 14250,"#1f7827", 6],
+                 [14251, 15000,"#154f1a", 3],
+                 [15001, 18000,"#0d3010", 0]];
+    timesLength = times.length;
+    for(var i = 0; i < timesLength; i++){
+      if(this.time >= times[i][0] && this.time <= times[i][1]){
+        this.backgroundColor = times[i][2];
+        this.sunlight = times[i][3];
+        break;
+      };
+    };
     // Check that the amount of power being consumend does not excede the power being generated.
     if (this.powerGenerated < this.powerConsumed){
       if (this.gridFail <= 0){  // Test for end game condition.
@@ -338,7 +358,7 @@ function game(){
     };
   };
   this.backLayer = function (){ // Render the background for the map.
-    context.fillStyle = "#1b5e20";
+    context.fillStyle = this.backgroundColor;
     context.fillRect(0, 0, canvasWidth, canvasHeight);
   };
   this.gui = function (){  // Render the game's GUI.
