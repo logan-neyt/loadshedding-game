@@ -76,7 +76,6 @@ function defaultSidebar(){
   this.font = "px Nova Flat"; // The font used for the sidebars (Scale will be provided when drawing).
   this.selectionColor = "#ef5350"; // The color of the selection cursor.
 
-  this.buttonAnimation = 0; // The frame the button animation is on.
   this.cursorAnimation = 0; // The frame the cursor animation is on.
   this.cursorExpanding = true;  // If the cursor is currently expanding or contracting.
   this.elements = [new Element()]; // Array of interactive elements in the active sidebar. Used for click detection.
@@ -103,7 +102,7 @@ function defaultSidebar(){
     // Restore the coordinate system.
     context.restore();
   };
-  this.building = function(name, active, generation, consumption){  // Draw the default sidebar for when gameState.buildings are selected.
+  this.building = function(name, active, generation, consumption, inertia){  // Draw the default sidebar for when gameState.buildings are selected.
     this.backdrop();
     // Move the coordinate system.
     context.save();
@@ -135,8 +134,7 @@ function defaultSidebar(){
     // Draw buttons.
     context.fillStyle = this.buttonColor2;
     context.fillRect(15 * drawingScale, 122 * drawingScale, this.width - (34.5 * drawingScale), 10.5 * drawingScale);
-    if(this.buttonAnimation > 0){
-      this.buttonAnimation--;
+    if(!(inertia === false)){
       context.fillStyle = this.buttonColor3;
     }else{
       context.fillStyle = this.buttonColor;
@@ -145,6 +143,10 @@ function defaultSidebar(){
     context.font = Math.round(6 * drawingScale) + this.font;
     context.fillStyle = this.buttonColor3;
     context.fillText("SWITCH", 21 * drawingScale, 129 * drawingScale);
+    if(!(inertia === false)){  // If the building is currently transitioning
+      context.fillStyle = "#e53935";
+      context.fillRect(15 * drawingScale, 122 * drawingScale, (this.width - (35 * drawingScale)) / 100 * inertia, 10 * drawingScale);
+    };
     // Restore the coordinate system.
     context.restore();
   };
@@ -156,7 +158,7 @@ function defaultSidebar(){
     }else{
       this.elements[0].set(15 * drawingScale, 130 * drawingScale, this.width - (20 * drawingScale), 140 * drawingScale);
       this.elements[0].function = function(){
-        gameState.buildings[gameState.buildingSelected].togglePwd();
+        gameState.buildings[gameState.buildingSelected].inertia = 100;
         defaultSidebar.buttonAnimation = 5;
       }
     };
@@ -425,6 +427,7 @@ function House(xPos, yPos){
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = ""; // Secondary color of the sprite.
   this.powered = true;  // If the building is active.
+  this.inertia = false; // Amount of time the building will take to change state.
   this.lights = [false, 0, 9002];  // If the window should be lit, when it should be lit and when it should turn off.
   this.consumption = 0;  // Amount of power the building is consuming.
 
@@ -432,6 +435,15 @@ function House(xPos, yPos){
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
 
   this.update = function (){  // Update the state of the object.
+    // Update the inertia & powered state.
+    if(!(this.inertia === false)){
+      if(this.inertia > 0){
+        this.inertia = this.inertia - 1.5;
+      }else{
+        this.inertia = false;
+        this.togglePwd();
+      };
+    };
     // Check if the lights should be on.
     if(gameState.time == this.lights[1]){ // If it is time to turn on the lights
       this.lights[0] = true;  // Turn on the light.
@@ -487,7 +499,7 @@ function House(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("House", this.powered, 0, this.consumption);
+    defaultSidebar.building("House", this.powered, 0, this.consumption, this.inertia);
     var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
@@ -513,6 +525,7 @@ function Office(xPos, yPos){
   this.y2 = yPos + (12 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
   this.color = "grey";  // Primary color of the sprite.
   this.powered = true;  // If the building is active.
+  this.inertia = false; // Amount of time the building will take to change state.
   this.lights = [[false, 0, 9002]]  // If the window should be lit, when it should be lit and when it should turn off.
   this.consumption = 0;  // Amount of power the building is consuming.
 
@@ -521,6 +534,15 @@ function Office(xPos, yPos){
   };
 
   this.update = function (){  // Update the state of the object.
+    // Update the inertia & powered state.
+    if(!(this.inertia === false)){
+      if(this.inertia > 0){
+        this.inertia = this.inertia - 0.5;
+      }else{
+        this.inertia = false;
+        this.togglePwd();
+      };
+    };
     // Check if the lights should be on.
     var lightsLength = this.lights.length;
     for(var i = 0; i < lightsLength; i++){
@@ -589,7 +611,7 @@ function Office(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Office", this.powered, 0, this.consumption);
+    defaultSidebar.building("Office", this.powered, 0, this.consumption, this.inertia);
     var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
@@ -615,13 +637,24 @@ function Factory(xPos, yPos){
   this.y2 = yPos + (10 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = ""; // Secondary color of the sprite.
-  this.powered = true;  // If the building is powered
+  this.powered = true;  // If the building is powered.
+  this.inertia = false; // Amount of time the building will take to change state.
   this.consumption = 0;  // Amount of power the building is consuming.
 
   this.color2Possibles = ["#3949ab", "#d32f2f", "#d4e157", "#c56000"];
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
 
   this.update = function(){
+    // Update the inertia & powered state.
+    if(!(this.inertia === false)){
+      if(this.inertia > 0){
+        this.inertia = this.inertia - 0.25;
+      }else{
+        this.inertia = false;
+        this.togglePwd();
+      };
+    };
+    // Calculate the consumption.
     if(this.powered){
       this.consumption = 30;
       gameState.consume(this.consumption);  // Update the gameState's variables.
@@ -672,7 +705,7 @@ function Factory(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Factory", this.powered, 0, this.consumption);
+    defaultSidebar.building("Factory", this.powered, 0, this.consumption, this.inertia);
     var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
@@ -700,9 +733,19 @@ function WindTurbine(xPos, yPos){
   this.color2 = "darkgrey"; // Secondary color of the sprite.
   this.frame = getRandomInt(8) * 15; // The animation frame the sprite is currently in.
   this.powered = true;  // If the building is active.
+  this.inertia = false; // Amount of time the building will take to change state.
   this.generation = 0;  // Amount of power the building is generating.
 
   this.update = function(){
+    // Update the inertia & powered state.
+    if(!(this.inertia === false)){
+      if(this.inertia > 0){
+        this.inertia = this.inertia - 1.5;
+      }else{
+        this.inertia = false;
+        this.togglePwd();
+      };
+    };
     // Increment the animation.
     if(this.powered && gameState.wind > 0){  // If building is active and there is wind
       this.frame = this.frame + gameState.wind;
@@ -760,7 +803,7 @@ function WindTurbine(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Wind Turbine", this.powered, this.generation, 0);
+    defaultSidebar.building("Wind Turbine", this.powered, this.generation, 0, this.inertia);
     var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
@@ -788,9 +831,19 @@ function SolarPanel(xPos, yPos){
   this.color2 = "blue"; // Secondary color of the sprite.
   this.color3 = "lightblue"; // Third color for the sprite.
   this.powered = true;  // If this building is active.
+  this.inertia = false; // Amount of time the building will take to change state.
   this.generation = 0;  // Amount of power the building is generating.
 
   this.update = function(){
+    // Update the inertia & powered state.
+    if(!(this.inertia === false)){
+      if(this.inertia > 0){
+        this.inertia = this.inertia - 2;
+      }else{
+        this.inertia = false;
+        this.togglePwd();
+      };
+    };
     // Calculate generation.
     if(this.powered){
       if(gameState.clouds == 0){  // Protect against zero devisions.
@@ -835,7 +888,7 @@ function SolarPanel(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Solar Panel", this.powered, this.generation, 0);
+    defaultSidebar.building("Solar Panel", this.powered, this.generation, 0, this.inertia);
     var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
