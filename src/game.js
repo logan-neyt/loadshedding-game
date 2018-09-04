@@ -362,6 +362,21 @@ function game(){
     context.fillRect(0, 0, canvasWidth, canvasHeight);
   };
   this.gui = function (){  // Render the game's GUI.
+    // Panic message.
+    if(this.gridFail < 300){  // If the grid is failing
+      var failTime = Math.floor((this.gridFail / 60) * 10) / 10;
+      if((failTime % 1) == 0){
+        failTime = failTime + ".0";
+      };
+      if(failTime < 0){
+        failTime = "0.0";
+      };
+      context.fillStyle = "#e53935";
+      context.fillRect(0, 0, canvasWidth, 8 * drawingScale);
+      context.font = Math.round(6 * drawingScale) + this.font;
+      context.fillStyle = this.textColor;
+      context.fillText("Warning! Grid going offline in " + failTime + "s", 165 * drawingScale, 6 * drawingScale);
+    };
     // Running stats.
     context.save();
     context.fillStyle = this.color;
