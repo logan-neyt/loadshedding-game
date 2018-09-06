@@ -360,7 +360,8 @@ function game(){
   this.futureWeather = [[7, 2, "Windy, Clear", 1800]];  // Array to hold at least 12hrs worth of pre-generated weather. Required for the weather forecast.
   this.powerGenerated = 1; // How much power is being generated.
   this.powerConsumed = 0; // How much power is being consumed.
-  this.gridFail = 300;  // Counts down to fail if the amount of power being consumend exceded the power being generated.
+  this.gridFailTime = 360; // How many frames before the game is lost.
+  this.gridFail = this.gridFailTime;  // Counts down to fail if the amount of power being consumend exceded the power being generated.
 
   this.friendlyTime = function(){ // Return the game time in a 24 hour format.
     this.hours = Math.floor(this.time / 750);
@@ -454,7 +455,7 @@ function game(){
       };
       this.gridFail--;  // Continue the countdown.
     } else {  // If the grid is fine
-      this.gridFail = 300;  // Reset the count down.
+      this.gridFail = this.gridFailTime;  // Reset the count down.
       this.score = this.score + (this.powerConsumed / 750); // If all is well, add to the player's score.
     };
     // Clear the power variables for the next turn.
@@ -483,7 +484,7 @@ function game(){
   };
   this.gui = function (){  // Render the game's GUI.
     // Panic message.
-    if(this.gridFail < 300){  // If the grid is failing
+    if(this.gridFail < this.gridFailTime){  // If the grid is failing
       var failTime = Math.floor((this.gridFail / 60) * 10) / 10;
       if((failTime % 1) == 0){
         failTime = failTime + ".0";
