@@ -463,7 +463,6 @@ function House(xPos, yPos){
     }else{
       this.consumption = 0;
     };
-
   };
   this.render = function (){
     this.sprite(this.x, this.y, drawingScale);
@@ -963,7 +962,7 @@ function newGame(){
     }
   });
 
-  canvas.addEventListener("mousedown", function(event){
+  canvas.addEventListener("mousedown", gameClick = function(event){
     if (event.which == 1){
       console.log("Clicked (" + event.pageX + ", " + event.pageY + ")   (" + Math.round(event.pageX / drawingScale) + ", " + Math.round(event.pageY / drawingScale) + ")"); // Temporary code to help me debug and place elements. Really kick me if I leave this in! :-P
       if(event.pageX > defaultSidebar.width){ // If the event does not land on the sidebar.
@@ -972,10 +971,9 @@ function newGame(){
             gameState.buildings[i].onClick();
             if(gameState.buildingSelected === i){  // If the user clicked on the selected building
               gameState.buildingSelected = false; // Deselect the building.
-              defaultSidebar.elements[0].empty();
+              defaultSidebar.elements[0].clear();
             }else{
               gameState.buildingSelected = i; // Select the building.
-
             };
             return; // No need to keep looping.
           };
