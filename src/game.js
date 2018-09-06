@@ -5,7 +5,7 @@ var context = canvas.getContext("2d");  // Create the context used for drawing.
 var canvasHeight; // The height of the canvas.
 var canvasWidth; // The width of the canvas.
 var drawingScale; // Distance between grid references used in drawing.
-resizeCanvas()
+resizeCanvas();
 
 var loop; // Create a global loop variable.
 var gameState;  // Create a global gameState variable.
@@ -20,7 +20,16 @@ function resizeCanvas(){
   canvasHeight = canvas.height; // Set the height of the canvas.
   canvasWidth = canvas.width; // Set the width of the canvas.
   drawingScale = canvasWidth / 384; // Set the distance between grid references.
+  // Recalculate the positions of all the sprites.
+  if(gameState != undefined){
+    defaultSidebar.rescale();
+    var buildingsLength = gameState.buildings.length;
+    for(var i = 0; i < buildingsLength; i++){
+      gameState.buildings[i].rescale();
+    };
+  };
 };
+window.addEventListener("resize", resizeCanvas);
 
 function getRandomInt(max) {
   /*
@@ -33,8 +42,16 @@ function endGame(day, time){
   /*
     Display the end game screen.
   */
-  loop.stop()  // Stop the game loop.
-  canvas.removeEventListener("mousedown");
+  this.color = "#0077c2"; // Color of the end game screen.
+  this.textColor = "#fafafa"; // The color used for the text.
+  this.font = "px Nova Flat"; // The font used for the sidebars (Scale will be provided when drawing).
+
+  loop.stop();  // Stop the game loop.
+  canvas.removeEventListener("mousedown", gameClick); // Remove the game click detection.
+
+  // Draw the screen.
+  context.fillStyle = this.color;
+  context.fillRect(50 * drawingScale, 50 * drawingScale, canvasWidth - (100 * drawingScale), canvasHeight - (100 * drawingScale));
 };
 
 function Element(){
@@ -65,7 +82,6 @@ function defaultSidebar(){
     Function to hold the default values and draw the sidebar when nothing is selected.
     It also handles the selection cursor.
    */
-  this.width = 70 * drawingScale;
   this.color = "#0077c2";  // The primary color used in the sidebars.
   this.color2 = "#0d47a1"; // The secondary color used in the sidebars.
   this.color3 = "#0d47a1"; // The accent color used in the sidebars.
@@ -79,6 +95,11 @@ function defaultSidebar(){
   this.cursorAnimation = 0; // The frame the cursor animation is on.
   this.cursorExpanding = true;  // If the cursor is currently expanding or contracting.
   this.elements = [new Element()]; // Array of interactive elements in the active sidebar. Used for click detection.
+
+  this.rescale = function(){  // Recalculate the width when the canvas is resized.
+    this.width = 70 * drawingScale;
+  };
+  this.rescale();  // Must be run atleast once.
 
   this.relScale = function(x, y, x2, y2){ // Function to get a relative scale and coordinates for drawing a sprite on the sidebar.
     var sizeX = (x2 - x);
@@ -420,10 +441,8 @@ function House(xPos, yPos){
   /*
     Object to handle a house building. Write once and reuse.
   */
-  this.x = xPos;  // X coordinate of the sprite.
-  this.y = yPos;  // Y coordinate of the sprite.
-  this.x2 = xPos + (8 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
-  this.y2 = yPos + (6 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  this.rawX = xPos; // Unconverted X coordinate in drawingScale units.
+  this.rawY = yPos; // Unconverted Y coordinate in drawingScale units.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = ""; // Secondary color of the sprite.
   this.powered = true;  // If the building is active.
@@ -433,6 +452,14 @@ function House(xPos, yPos){
 
   this.color2Possibles = ["#3949ab", "#d32f2f", "#d4e157", "#c56000"];
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
+
+  this.rescale = function(){ // Recalculate coordinates when drawingScale changes.
+    this.x = this.rawX * drawingScale;  // X coordinate of the sprite in pixels.
+    this.y = this.rawY * drawingScale;  // Y coordinate of the sprite in pixels.
+    this.x2 = this.x + (8 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+    this.y2 = this.y + (6 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  };
+  this.rescale(); // Must be run at least once.
 
   this.update = function (){  // Update the state of the object.
     // Update the inertia & powered state.
@@ -518,10 +545,8 @@ function Office(xPos, yPos){
   /*
     Object to handle an office building. Write once and reuse.
   */
-  this.x = xPos;  // X coordinate of the sprite.
-  this.y = yPos;  // Y coordinate of the sprite.
-  this.x2 = xPos + (13 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
-  this.y2 = yPos + (12 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  this.rawX = xPos; // Unconverted X coordinate in drawingScale units.
+  this.rawY = yPos; // Unconverted Y coordinate in drawingScale units.
   this.color = "grey";  // Primary color of the sprite.
   this.powered = true;  // If the building is active.
   this.inertia = false; // Amount of time the building will take to change state.
@@ -531,6 +556,14 @@ function Office(xPos, yPos){
   for(var i = 0; i < 9; i++){ // Populate the windows array.
     this.lights.push([false, 0, 9002])
   };
+
+  this.rescale = function(){ // Recalculate coordinates when drawingScale changes.
+    this.x = this.rawX * drawingScale;  // X coordinate of the sprite in pixels.
+    this.y = this.rawY * drawingScale;  // Y coordinate of the sprite in pixels.
+    this.x2 = this.x + (13 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+    this.y2 = this.y + (12 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  };
+  this.rescale(); // Must be run at least once.
 
   this.update = function (){  // Update the state of the object.
     // Update the inertia & powered state.
@@ -630,10 +663,8 @@ function Factory(xPos, yPos){
   /*
     Object to handle a factory building. Write once and reuse.
   */
-  this.x = xPos;  // X coordinate of the sprite.
-  this.y = yPos;  // Y coordinate of the sprite.
-  this.x2 = xPos + (12 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
-  this.y2 = yPos + (10 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  this.rawX = xPos; // Unconverted X coordinate in drawingScale units.
+  this.rawY = yPos; // Unconverted Y coordinate in drawingScale units.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = ""; // Secondary color of the sprite.
   this.powered = true;  // If the building is powered.
@@ -642,6 +673,14 @@ function Factory(xPos, yPos){
 
   this.color2Possibles = ["#3949ab", "#d32f2f", "#d4e157", "#c56000"];
   this.color2 = this.color2Possibles[getRandomInt(4)];  // Choose a random secondary color.
+
+  this.rescale = function(){ // Recalculate coordinates when drawingScale changes.
+    this.x = this.rawX * drawingScale;  // X coordinate of the sprite in pixels.
+    this.y = this.rawY * drawingScale;  // Y coordinate of the sprite in pixels.
+    this.x2 = this.x + (12 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+    this.y2 = this.y + (10 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  };
+  this.rescale(); // Must be run at least once.
 
   this.update = function(){
     // Update the inertia & powered state.
@@ -724,16 +763,22 @@ function WindTurbine(xPos, yPos){
   /*
     Object to handle a wind turbine. Write once and reuse.
   */
-  this.x = xPos;  // X coordinate of the sprite.
-  this.y = yPos;  // Y coordinate of the sprite.
-  this.x2 = xPos + (5 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
-  this.y2 = yPos + (9 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  this.rawX = xPos; // Unconverted X coordinate in drawingScale units.
+  this.rawY = yPos; // Unconverted Y coordinate in drawingScale units.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = "darkgrey"; // Secondary color of the sprite.
   this.frame = getRandomInt(8) * 15; // The animation frame the sprite is currently in.
   this.powered = true;  // If the building is active.
   this.inertia = false; // Amount of time the building will take to change state.
   this.generation = 0;  // Amount of power the building is generating.
+
+  this.rescale = function(){ // Recalculate coordinates when drawingScale changes.
+    this.x = this.rawX * drawingScale;  // X coordinate of the sprite in pixels.
+    this.y = this.rawY * drawingScale;  // Y coordinate of the sprite in pixels.
+    this.x2 = this.x + (5 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+    this.y2 = this.y + (9 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  };
+  this.rescale(); // Must be run at least once.
 
   this.update = function(){
     // Update the inertia & powered state.
@@ -822,16 +867,22 @@ function SolarPanel(xPos, yPos){
   /*
     Object to handle a solar panal. Write once and reuse.
   */
-  this.x = xPos;  // X coordinate of the sprite.
-  this.y = yPos;  // Y coordinate of the sprite.
-  this.x2 = xPos + (2 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
-  this.y2 = yPos + (3 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  this.rawX = xPos; // Unconverted X coordinate in drawingScale units.
+  this.rawY = yPos; // Unconverted Y coordinate in drawingScale units.
   this.color = "grey";  // Primary color of the sprite.
   this.color2 = "blue"; // Secondary color of the sprite.
   this.color3 = "lightblue"; // Third color for the sprite.
   this.powered = true;  // If this building is active.
   this.inertia = false; // Amount of time the building will take to change state.
   this.generation = 0;  // Amount of power the building is generating.
+
+  this.rescale = function(){ // Recalculate coordinates when drawingScale changes.
+    this.x = this.rawX * drawingScale;  // X coordinate of the sprite in pixels.
+    this.y = this.rawY * drawingScale;  // Y coordinate of the sprite in pixels.
+    this.x2 = this.x + (2 * drawingScale);  // Bottom corner X of the sprite. Used for click detection.
+    this.y2 = this.y + (3 * drawingScale);  // Bottom corner Y of the sprite. Used for click detection.
+  };
+  this.rescale(); // Must be run at least once.
 
   this.update = function(){
     // Update the inertia & powered state.
@@ -906,36 +957,36 @@ function SolarPanel(xPos, yPos){
 function newGame(){
   gameState = new game(); // Create a new game() object.
   defaultSidebar = new defaultSidebar();
-  gameState.buildings = [new WindTurbine(80 * drawingScale, 25  * drawingScale),  // Create an array with all the gameState.buildings in it.
-                   new WindTurbine(90 * drawingScale, 25  * drawingScale),
-                   new WindTurbine(100 * drawingScale, 25 * drawingScale),
-                   new WindTurbine(85  * drawingScale, 35 * drawingScale),
-                   new WindTurbine(95  * drawingScale, 35 * drawingScale),
-                   new WindTurbine(105  * drawingScale, 35 * drawingScale),
-                   new House(200 * drawingScale, 40 * drawingScale),
-                   new House(210 * drawingScale, 40 * drawingScale),
-                   new House(220 * drawingScale, 40 * drawingScale),
-                   new House(230 * drawingScale, 40 * drawingScale),
-                   new House(200 * drawingScale, 50 * drawingScale),
-                   new House(210 * drawingScale, 50 * drawingScale),
-                   new House(220 * drawingScale, 50 * drawingScale),
-                   new House(230 * drawingScale, 50 * drawingScale),
-                   new House(240 * drawingScale, 45 * drawingScale),
-                   new Office(200 * drawingScale, 80 * drawingScale),
-                   new Office(215 * drawingScale, 80 * drawingScale),
-                   new Office(230 * drawingScale, 80 * drawingScale),
-                   new SolarPanel(227.5 * drawingScale, 15 * drawingScale),
-                   new SolarPanel(232.5 * drawingScale, 15 * drawingScale),
-                   new SolarPanel(237.5 * drawingScale, 15 * drawingScale),
-                   new SolarPanel(242.5 * drawingScale, 15 * drawingScale),
-                   new SolarPanel(247.5 * drawingScale, 15 * drawingScale),
-                   new SolarPanel(230 * drawingScale, 20 * drawingScale),
-                   new SolarPanel(235 * drawingScale, 20 * drawingScale),
-                   new SolarPanel(240 * drawingScale, 20 * drawingScale),
-                   new SolarPanel(245 * drawingScale, 20 * drawingScale),
-                   new SolarPanel(250 * drawingScale, 20 * drawingScale),
-                   new Factory(80 * drawingScale, 100 * drawingScale),
-                   new Factory(100 * drawingScale, 100 * drawingScale)]
+  gameState.buildings = [new WindTurbine(80, 25),  // Create an array with all the gameState.buildings in it.
+                   new WindTurbine(90, 25),
+                   new WindTurbine(100, 25),
+                   new WindTurbine(85, 35),
+                   new WindTurbine(95, 35),
+                   new WindTurbine(105, 35),
+                   new House(200, 40),
+                   new House(210, 40),
+                   new House(220, 40),
+                   new House(230, 40),
+                   new House(200, 50),
+                   new House(210, 50),
+                   new House(220, 50),
+                   new House(230, 50),
+                   new House(240, 45),
+                   new Office(200, 80),
+                   new Office(215, 80),
+                   new Office(230, 80),
+                   new SolarPanel(227.5, 15),
+                   new SolarPanel(232.5, 15),
+                   new SolarPanel(237.5, 15),
+                   new SolarPanel(242.5, 15),
+                   new SolarPanel(247.5, 15),
+                   new SolarPanel(230, 20),
+                   new SolarPanel(235, 20),
+                   new SolarPanel(240, 20),
+                   new SolarPanel(245, 20),
+                   new SolarPanel(250, 20),
+                   new Factory(80, 100),
+                   new Factory(100, 100)]
   var buildingsLength = gameState.buildings.length;
 
   loop = kontra.gameLoop({  // Create the kontra endless game loop.
