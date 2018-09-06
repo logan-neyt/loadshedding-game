@@ -5,11 +5,12 @@ var context = canvas.getContext("2d");  // Create the context used for drawing.
 var canvasHeight; // The height of the canvas.
 var canvasWidth; // The width of the canvas.
 var drawingScale; // Distance between grid references used in drawing.
+var highscores = []; // Array of the best scores.
 resizeCanvas();
 
 var loop; // Create a global loop variable.
 var gameState;  // Create a global gameState variable.
-newGame();  // Start the first game.
+beginScreen();  // Start the first game.
 
 function resizeCanvas(){
   /*
@@ -38,20 +39,116 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 };
 
+function addHighscore(score, days){
+  /*
+    Add a new highscore, sort the array and pop the lowest.
+  */
+  // Add the new score.
+  highscores.push([score, days]);
+  // Perform a simple reversed bubble sort on the highscores array.
+  var highscoresLength = highscores.length;
+  var floating = true;
+  while(floating){
+    floating = false;
+    for(var i = highscoresLength - 1; i > 0; i--){
+      if(highscores[i][0] > highscores[i-1][0]){
+        var lower = highscores[i-1];
+        highscores[i-1] = highscores[i];
+        highscores[i] = lower;
+        floating = true;
+      }else if(highscores[i][0] == highscores[i-1][0] && highscores[i][1] < highscores[i-1][1]){
+        var higher = highscores[i-1];
+        highscores[i-1] = highscores[i];
+        highscores[i] = higher;
+        floating = true;
+      };
+    };
+  };
+  // If there are more than 10 highscores, pop the last one.
+  if(highscoresLength > 10){
+    highscores.pop();
+  };
+};
+
+function beginScreen(){
+  /*
+    Display the begin game screen & tutorial.
+  */
+  this.color = "#0077c2"; // Color of the begin game screen.
+  this.buttonColor = "#00bcd4"; // The primary color used for buttons.
+  this.buttonColor2 = "#008ba3";  // The accent color used for buttons.
+  this.textColor = "#fafafa"; // The color used for the text.
+  this.font = "px Nova Flat"; // The font used for the sidebars (Scale will be provided when drawing).
+
+  beginLoop = kontra.gameLoop({
+    update: function(){
+
+    },
+    render:function(){
+      context.fillStyle = color;
+      context.fillRect(50 * drawingScale, 30 * drawingScale, canvasWidth - (100 * drawingScale), 110 * drawingScale);
+      context.fillStyle = buttonColor2;
+      context.fillRect(154 * drawingScale, 122 * drawingScale, canvasWidth - (307 * drawingScale), 11 * drawingScale);
+      context.fillStyle = buttonColor;
+      context.fillRect(154 * drawingScale, 122 * drawingScale, canvasWidth - (308 * drawingScale), 10 * drawingScale);
+      context.fillStyle = textColor;
+      context.font = Math.round(6 * drawingScale) + font;
+      context.fillText("New Game", 180 * drawingScale, 129 * drawingScale);
+    }
+  });
+  canvas.addEventListener("mousedown", beginClick = function(event){
+    if(event.which == 1){
+      if(event.x >= (154 * drawingScale) && event.x <= (canvasWidth - (154 * drawingScale)) && event.y >= (122 * drawingScale) && event.y <= ((122 + 10) * drawingScale)){
+        canvas.removeEventListener("mousedown", beginClick);
+        beginLoop.stop();
+        newGame();  // Start game.
+      };
+    };
+  });
+  beginLoop.start();
+};
 function endGame(day, time){
   /*
     Display the end game screen.
   */
-  this.color = "#0077c2"; // Color of the end game screen.
+  this.color = "#0077c2"; // Color of the begin game screen.
+  this.buttonColor = "#00bcd4"; // The primary color used for buttons.
+  this.buttonColor2 = "#008ba3";  // The accent color used for buttons.
   this.textColor = "#fafafa"; // The color used for the text.
   this.font = "px Nova Flat"; // The font used for the sidebars (Scale will be provided when drawing).
 
-  loop.stop();  // Stop the game loop.
   canvas.removeEventListener("mousedown", gameClick); // Remove the game click detection.
+  loop.stop();  // Stop the game loop.
+  addHighscore(gameState.score, gameState.days);
+  endLoop = kontra.gameLoop({
+    update: function(){
 
-  // Draw the screen.
-  context.fillStyle = this.color;
-  context.fillRect(50 * drawingScale, 50 * drawingScale, canvasWidth - (100 * drawingScale), canvasHeight - (100 * drawingScale));
+    },
+    render:function(){
+      context.fillStyle = color;
+      context.fillRect(50 * drawingScale, 30 * drawingScale, canvasWidth - (100 * drawingScale), 110 * drawingScale);
+      context.fillStyle = buttonColor2;
+      context.fillRect(154 * drawingScale, 122 * drawingScale, canvasWidth - (307 * drawingScale), 11 * drawingScale);
+      context.fillStyle = buttonColor;
+      context.fillRect(154 * drawingScale, 122 * drawingScale, canvasWidth - (308 * drawingScale), 10 * drawingScale);
+      context.fillStyle = textColor;
+      context.font = Math.round(6 * drawingScale) + font;
+      context.fillText("The grid is", 60 * drawingScale, 40 * drawingScale);
+      context.fillText("New Game", 180 * drawingScale, 129 * drawingScale);
+      context.font = Math.round(12 * drawingScale) + font;
+      context.fillText("Offline", 60 * drawingScale, 51 * drawingScale)
+    }
+  });
+  canvas.addEventListener("mousedown", endClick = function(event){
+    if(event.which == 1){
+      if(event.x >= (154 * drawingScale) && event.x <= (canvasWidth - (154 * drawingScale)) && event.y >= (122 * drawingScale) && event.y <= ((122 + 10) * drawingScale)){
+        canvas.removeEventListener("mousedown", endClick);
+        endLoop.stop();
+        newGame();  // Start game.
+      };
+    };
+  });
+  endLoop.start();
 };
 
 function Element(){
@@ -77,7 +174,7 @@ function Element(){
   this.clear();
 };
 
-function defaultSidebar(){
+function defSidebar(){
   /*
     Function to hold the default values and draw the sidebar when nothing is selected.
     It also handles the selection cursor.
@@ -956,7 +1053,7 @@ function SolarPanel(xPos, yPos){
 
 function newGame(){
   gameState = new game(); // Create a new game() object.
-  defaultSidebar = new defaultSidebar();
+  defaultSidebar = new defSidebar();
   gameState.buildings = [new WindTurbine(80, 25),  // Create an array with all the gameState.buildings in it.
                    new WindTurbine(90, 25),
                    new WindTurbine(100, 25),
