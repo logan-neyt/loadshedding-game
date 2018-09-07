@@ -117,9 +117,17 @@ function endGame(day, time){
   this.textColor = "#fafafa"; // The color used for the text.
   this.font = "px Nova Flat"; // The font used for the sidebars (Scale will be provided when drawing).
 
+  this.dayPlural = function(days){
+    if(days == 1){
+      return "1 day";
+    }else{
+      return days + " days";
+    };
+  };
+
   canvas.removeEventListener("mousedown", gameClick); // Remove the game click detection.
   loop.stop();  // Stop the game loop.
-  addHighscore(gameState.score, gameState.days);
+  addHighscore(gameState.score, gameState.day);
   endLoop = kontra.gameLoop({
     update: function(){
 
@@ -135,6 +143,11 @@ function endGame(day, time){
       context.font = Math.round(6 * drawingScale) + font;
       context.fillText("The grid is", 60 * drawingScale, 40 * drawingScale);
       context.fillText("New Game", 180 * drawingScale, 129 * drawingScale);
+      context.fillText("Highscores:", canvasWidth - (140 * drawingScale), 40 * drawingScale);
+      var highscoresLength = highscores.length;
+      for(var i = 0; i < highscoresLength; i++){
+        context.fillText((i + 1) + ": " + Math.floor(highscores[i][0]) + "kWH in " + dayPlural(highscores[i][1]), canvasWidth - (135 * drawingScale), (47 + (i * 7)) * drawingScale);
+      };
       context.font = Math.round(12 * drawingScale) + font;
       context.fillText("Offline", 60 * drawingScale, 51 * drawingScale)
     }
