@@ -142,6 +142,8 @@ function endGame(day, time){
       context.fillStyle = textColor;
       context.font = Math.round(6 * drawingScale) + font;
       context.fillText("The grid is", 60 * drawingScale, 40 * drawingScale);
+      context.fillText("Your score:", 60 * drawingScale, 65 * drawingScale);
+      context.fillText("in " + dayPlural(gameState.day), 60 * drawingScale, 83 * drawingScale);
       context.fillText("New Game", 180 * drawingScale, 129 * drawingScale);
       context.fillText("Highscores:", canvasWidth - (140 * drawingScale), 40 * drawingScale);
       var highscoresLength = highscores.length;
@@ -149,7 +151,8 @@ function endGame(day, time){
         context.fillText((i + 1) + ": " + Math.floor(highscores[i][0]) + "kWH in " + dayPlural(highscores[i][1]), canvasWidth - (135 * drawingScale), (47 + (i * 7)) * drawingScale);
       };
       context.font = Math.round(12 * drawingScale) + font;
-      context.fillText("Offline", 60 * drawingScale, 51 * drawingScale)
+      context.fillText("Offline", 60 * drawingScale, 51 * drawingScale);
+      context.fillText(Math.floor(gameState.score) + "kWH", 60 * drawingScale, 76 * drawingScale);
     }
   });
   canvas.addEventListener("mousedown", endClick = function(event){
