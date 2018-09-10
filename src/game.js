@@ -1,15 +1,15 @@
 kontra.init();  // Initilize the kontra library.
 
-var canvas = document.querySelector("canvas");  // Find the canvas that we will be using.
-var context = canvas.getContext("2d");  // Create the context used for drawing.
-var canvasHeight; // The height of the canvas.
-var canvasWidth; // The width of the canvas.
-var drawingScale; // Distance between grid references used in drawing.
-var highscores = []; // Array of the best scores.
-resizeCanvas();
+let canvas = document.querySelector("canvas");  // Find the canvas that we will be using.
+let context = canvas.getContext("2d");  // Create the context used for drawing.
+let canvasHeight; // The height of the canvas.
+let canvasWidth; // The width of the canvas.
+let drawingScale; // Distance between grid references used in drawing.
+let highscores = []; // Array of the best scores.
 
-var loop; // Create a global loop variable.
-var gameState;  // Create a global gameState variable.
+let loop; // Create a global loop variable.
+let gameState;  // Create a global gameState variable.
+resizeCanvas(); // Get the size of the canvas and set drawing scale.
 beginScreen();  // Start the first game.
 
 function resizeCanvas(){
@@ -24,8 +24,8 @@ function resizeCanvas(){
   // Recalculate the positions of all the sprites.
   if(gameState != undefined){
     defaultSidebar.rescale();
-    var buildingsLength = gameState.buildings.length;
-    for(var i = 0; i < buildingsLength; i++){
+    let buildingsLength = gameState.buildings.length;
+    for(let i = 0; i < buildingsLength; i++){
       gameState.buildings[i].rescale();
     };
   };
@@ -46,18 +46,18 @@ function addHighscore(score, days){
   // Add the new score.
   highscores.push([score, days]);
   // Perform a simple reversed bubble sort on the highscores array.
-  var highscoresLength = highscores.length;
-  var floating = true;
+  let highscoresLength = highscores.length;
+  let floating = true;
   while(floating){
     floating = false;
-    for(var i = highscoresLength - 1; i > 0; i--){
+    for(let i = highscoresLength - 1; i > 0; i--){
       if(highscores[i][0] > highscores[i-1][0]){
-        var lower = highscores[i-1];
+        let lower = highscores[i-1];
         highscores[i-1] = highscores[i];
         highscores[i] = lower;
         floating = true;
       }else if(highscores[i][0] == highscores[i-1][0] && highscores[i][1] < highscores[i-1][1]){
-        var higher = highscores[i-1];
+        let higher = highscores[i-1];
         highscores[i-1] = highscores[i];
         highscores[i] = higher;
         floating = true;
@@ -154,7 +154,7 @@ function endGame(day, time){
       context.fillText("New Game", 180 * drawingScale, 129 * drawingScale);
       context.fillText("Highscores:", canvasWidth - (140 * drawingScale), 40 * drawingScale);
       var highscoresLength = highscores.length;
-      for(var i = 0; i < highscoresLength; i++){
+      for(let i = 0; i < highscoresLength; i++){
         context.fillText((i + 1) + ": " + Math.floor(highscores[i][0]) + "kWH in " + dayPlural(highscores[i][1]), canvasWidth - (135 * drawingScale), (47 + (i * 7)) * drawingScale);
       };
       context.font = Math.round(12 * drawingScale) + font;
@@ -222,8 +222,8 @@ function defSidebar(){
   this.rescale();  // Must be run atleast once.
 
   this.relScale = function(x, y, x2, y2){ // Function to get a relative scale and coordinates for drawing a sprite on the sidebar.
-    var sizeX = (x2 - x);
-    var sizeY = (y2 - y);
+    let sizeX = (x2 - x);
+    let sizeY = (y2 - y);
     if (sizeX >= sizeY){
       return [9 * drawingScale, (30 * drawingScale) + ((sizeX - sizeY) / 2) * drawingScale, (51 * drawingScale * drawingScale) / sizeX];
     }else{
@@ -341,8 +341,8 @@ function defSidebar(){
   };
   this.cursor = function(x, y, x2, y2){
     // Calculate the size of the sprite in pixels.
-    var dx = (x2 - x);
-    var dy = (y2 - y);
+    let dx = (x2 - x);
+    let dy = (y2 - y);
     // Move the coordinate system.
     context.save();
     context.translate(x, y);
@@ -417,12 +417,12 @@ function game(){
     return frWeather;
   };
   this.weatherAtTime = function(cycles){  // Return the description of the weather at the cycle provided.
-    var duration = this.weatherDelay;
+    let duration = this.weatherDelay;
     if(duration >= cycles){
       return this.weather;
     };
-    var futureWeatherLength = this.futureWeather.length;
-    for(var i = 0; i < futureWeatherLength; i++){
+    let futureWeatherLength = this.futureWeather.length;
+    for(let i = 0; i < futureWeatherLength; i++){
       duration = duration + this.futureWeather[i][3];
       if(duration >= cycles){
         return this.futureWeather[i][2];
@@ -430,9 +430,9 @@ function game(){
     };
   };
   this.futureWeatherDuration = function(){  // Find how many cycles worth of weather are stored in futureWeather[].
-    var duration = 0;
-    var futureWeatherLength = this.futureWeather.length;
-    for(var i = 0; i < futureWeatherLength; i++){
+    let duration = 0;
+    let futureWeatherLength = this.futureWeather.length;
+    for(let i = 0; i < futureWeatherLength; i++){
       duration = duration + this.futureWeather[i][3];
     };
     return duration;
@@ -452,7 +452,7 @@ function game(){
       this.day++;
       this.time = this.time - 18000;
     };
-    var times = [[0, 3000,"#0d3010", 0],
+    const times = [[0, 3000,"#0d3010", 0],
                  [3001, 3750,"#154f1a", 3],
                  [3751, 4500,"#1f7827", 6],
                  [4501, 5250,"#279931", 8],
@@ -463,8 +463,8 @@ function game(){
                  [13501, 14250,"#1f7827", 4],
                  [14251, 15000,"#154f1a", 2],
                  [15001, 18000,"#0d3010", 0]];
-    timesLength = times.length;
-    for(var i = 0; i < timesLength; i++){
+    const timesLength = times.length;
+    for(let i = 0; i < timesLength; i++){
       if(this.time >= times[i][0] && this.time <= times[i][1]){
         this.backgroundColor = times[i][2];
         this.sunlight = times[i][3];
@@ -488,8 +488,8 @@ function game(){
     this.weatherDelay--;
     // Generate new weather.
     while(this.futureWeatherDuration() < 9000){ // If there is less than 12hrs of weather pre-generated
-      var newWind = getRandomInt(11);
-      var newClouds = getRandomInt(11)
+      let newWind = getRandomInt(11);
+      let newClouds = getRandomInt(11)
       this.futureWeather.push([newWind, newClouds, this.friendlyWeather(newWind, newClouds), getRandomInt(18000) + 360]);
     };
     if (this.weatherDelay <= 0){  // If the weather must be changed.
@@ -508,7 +508,7 @@ function game(){
   this.gui = function (){  // Render the game's GUI.
     // Panic message.
     if(this.gridFail < this.gridFailTime){  // If the grid is failing
-      var failTime = Math.floor((this.gridFail / 60) * 10) / 10;
+      let failTime = Math.floor((this.gridFail / 60) * 10) / 10;
       if((failTime % 1) == 0){
         failTime = failTime + ".0";
       };
@@ -732,7 +732,7 @@ function Office(xPos, yPos){
     context.fillStyle = this.color;
     context.fillRect(0, 0, 13 * scale, 12 * scale);
     // Draw windows.
-    var windows = [[scale, scale, 2 * scale, 2 * scale],
+    const windows = [[scale, scale, 2 * scale, 2 * scale],
                    [4 * scale, scale, 2 * scale, 2 * scale],
                    [7 * scale, scale, 2 * scale, 2 * scale],
                    [10 * scale, scale, 2 * scale, 2 * scale],
@@ -742,17 +742,17 @@ function Office(xPos, yPos){
                    [10 * scale, 5 * scale, 2 * scale, 2 * scale],
                    [scale, 9 * scale, 2 * scale, 2 * scale],
                    [10 * scale, 9 * scale, 2 * scale, 2 * scale]]
-    var lightsLength = this.lights.length;
+    const lightsLength = this.lights.length;
     if(this.powered){
       context.fillStyle = "#ffff8b";
-      for(var i = 0; i < lightsLength; i++){
+      for(let i = 0; i < lightsLength; i++){
         if(this.lights[i][0]){  // Check if the lights should be on or off.
           context.fillRect(windows[i][0], windows[i][1], windows[i][2], windows[i][3]);
         };
       };
     };
     context.fillStyle = "#000000";
-    for(var i =0; i < lightsLength; i++){
+    for(let i =0; i < lightsLength; i++){
       if(!(this.powered) || !(this.lights[i][0])){
         context.fillRect(windows[i][0], windows[i][1], windows[i][2], windows[i][3]);
       };
@@ -765,7 +765,7 @@ function Office(xPos, yPos){
   };
   this.sidebar = function(){
     defaultSidebar.building("Office", this.powered, 0, this.consumption, this.inertia);
-    var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
+    let sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
   this.togglePwd = function(){
@@ -865,7 +865,7 @@ function Factory(xPos, yPos){
   };
   this.sidebar = function(){
     defaultSidebar.building("Factory", this.powered, 0, this.consumption, this.inertia);
-    var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
+    let sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
   this.togglePwd = function(){
@@ -952,7 +952,7 @@ function WindTurbine(xPos, yPos){
       context.fill();
       context.rotate(90 * (Math.PI / 180));
     };
-    for(var r = 0; r < 4; r++){
+    for(let r = 0; r < 4; r++){
       context.fillStyle = this.color2;
       context.beginPath();
       context.moveTo(-1.5 * scale, -2.5 * scale);
@@ -969,7 +969,7 @@ function WindTurbine(xPos, yPos){
   };
   this.sidebar = function(){
     defaultSidebar.building("Wind Turbine", this.powered, this.generation, 0, this.inertia);
-    var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
+    let sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
   this.togglePwd = function(){
@@ -1060,7 +1060,7 @@ function SolarPanel(xPos, yPos){
   };
   this.sidebar = function(){
     defaultSidebar.building("Solar Panel", this.powered, this.generation, 0, this.inertia);
-    var sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
+    let sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
   this.togglePwd = function(){
@@ -1108,20 +1108,20 @@ function newGame(){
                    new SolarPanel(250, 20),
                    new Factory(80, 100),
                    new Factory(100, 100)]
-  var buildingsLength = gameState.buildings.length;
+  const buildingsLength = gameState.buildings.length;
 
   loop = kontra.gameLoop({  // Create the kontra endless game loop.
     update: function(){
       gameState.update();
       defaultSidebar.update();
-      for (var i = 0; i < buildingsLength; i++){  // Update all the gameState.buildings in the array.
+      for (let i = 0; i < buildingsLength; i++){  // Update all the gameState.buildings in the array.
         gameState.buildings[i].update();
       }
     },
     render: function(){
       context.setTransform(1, 0, 0, 1, 0, 0); // Reset current transformation matrix to the identity matrix
       gameState.backLayer();  // Draw the background.
-      for (var i = 0; i < buildingsLength; i++){  // Render all the building sprites.
+      for (let i = 0; i < buildingsLength; i++){  // Render all the building sprites.
         gameState.buildings[i].render();
       };
       if(gameState.buildingSelected !== false){ // If there is a building selected
@@ -1138,7 +1138,7 @@ function newGame(){
     if (event.which == 1){
       console.log("Clicked (" + event.pageX + ", " + event.pageY + ")   (" + Math.round(event.pageX / drawingScale) + ", " + Math.round(event.pageY / drawingScale) + ")"); // Temporary code to help me debug and place elements. Really kick me if I leave this in! :-P
       if(event.pageX > defaultSidebar.width){ // If the event does not land on the sidebar.
-        for(var i = 0; i < buildingsLength; i++){ // Try to find a building that was clicked on.
+        for(let i = 0; i < buildingsLength; i++){ // Try to find a building that was clicked on.
           if(event.pageX >= gameState.buildings[i].x && event.pageX <= gameState.buildings[i].x2 && event.pageY >= gameState.buildings[i].y && event.pageY <= gameState.buildings[i].y2){
             gameState.buildings[i].onClick();
             if(gameState.buildingSelected === i){  // If the user clicked on the selected building
@@ -1153,7 +1153,7 @@ function newGame(){
         gameState.buildingSelected = false; // If nothing was clicked on, deselect the current selection.
       }else{  // If the event does land on the sidebar
         var sidebarElementsLength = defaultSidebar.elements.length;
-        for(var i = 0; i < sidebarElementsLength; i++){
+        for(let i = 0; i < sidebarElementsLength; i++){
           if(event.pageX >= defaultSidebar.elements[i].x && event.pageX <= defaultSidebar.elements[i].x2 && event.pageY >= defaultSidebar.elements[i].y && event.pageY <= defaultSidebar.elements[i].y2){
             defaultSidebar.elements[i].onClick();
             return; // No need to keep looping.
