@@ -1113,7 +1113,11 @@ function SolarPanel(xPos, yPos){
 function newGame(){
   gameState = new game(); // Create a new game() object.
   defaultSidebar = new defSidebar();
-  gameState.buildings = [new WindTurbine(80, 25),  // Create an array with all the gameState.buildings in it.
+  // Create an array with all the gameState.buildings in it.
+  gameState.buildings = [new WindTurbine(85, 15),
+                   new WindTurbine(95, 15),
+                   new WindTurbine(105, 15),
+                   new WindTurbine(80, 25),
                    new WindTurbine(90, 25),
                    new WindTurbine(100, 25),
                    new WindTurbine(85, 35),
@@ -1128,9 +1132,11 @@ function newGame(){
                    new House(220, 50),
                    new House(230, 50),
                    new House(240, 45),
-                   new Office(200, 80),
-                   new Office(215, 80),
-                   new Office(230, 80),
+                   new Office(150, 43),
+                   new Office(150, 58),
+                   new Office(150, 80),
+                   new Office(165, 80),
+                   new Office(180, 80),
                    new SolarPanel(227.5, 15),
                    new SolarPanel(232.5, 15),
                    new SolarPanel(237.5, 15),
@@ -1141,8 +1147,9 @@ function newGame(){
                    new SolarPanel(240, 20),
                    new SolarPanel(245, 20),
                    new SolarPanel(250, 20),
-                   new Factory(80, 100),
-                   new Factory(100, 100)]
+                   new Factory(80, 60),
+                   new Factory(100, 60),
+                   new Factory(115, 60)]
   const buildingsLength = gameState.buildings.length;
 
   loop = kontra.gameLoop({  // Create the kontra endless game loop.
