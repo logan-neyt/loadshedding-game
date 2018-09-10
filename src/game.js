@@ -99,7 +99,7 @@ function beginScreen(){
       context.fillText("3: Generation and consumption vary with the weather and time of day.", 65 * drawingScale, 61 * drawingScale);
       context.fillText("4: Keep an eye on the clock and weather forecast.", 65 * drawingScale, 68 * drawingScale);
       context.fillText("5: Toggle buildings on and offline, to manage consumption.", 65 * drawingScale, 75 * drawingScale);
-      context.fillText("6: Don't let consumption excede generation or the grid will go offline and the game will end.", 65 * drawingScale, 82 * drawingScale);
+      context.fillText("6: Don't let consumption exceed generation or the grid will go offline and the game will end.", 65 * drawingScale, 82 * drawingScale);
       context.fillText("New Game", 180 * drawingScale, 129 * drawingScale);
     }
   });
