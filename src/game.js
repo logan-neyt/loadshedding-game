@@ -5,7 +5,7 @@ let context = canvas.getContext("2d");  // Create the context used for drawing.
 let canvasHeight; // The height of the canvas.
 let canvasWidth; // The width of the canvas.
 let drawingScale; // Distance between grid references used in drawing.
-let highscores = []; // Array of the best scores.
+let highscores = loadHighscores(); // Array of the best scores.
 
 let loop; // Create a global loop variable.
 let gameState;  // Create a global gameState variable.
@@ -68,6 +68,18 @@ function addHighscore(score, days){
   if(highscoresLength > 10){
     highscores.pop();
   };
+};
+function storeHighscores(scores){
+  /*
+    Save the highscores list to the local machine.
+  */
+  localStorage.setItem("LNLSHighScores", JSON.stringify(scores));
+};
+function loadHighscores(){
+  /*
+    Return highscores list from the local machine.
+  */
+  return JSON.parse(localStorage.getItem("LNLSHighScores")) || [];
 };
 
 function beginScreen(){
@@ -135,6 +147,7 @@ function endGame(day, time){
   canvas.removeEventListener("mousedown", gameClick); // Remove the game click detection.
   loop.stop();  // Stop the game loop.
   addHighscore(gameState.score, gameState.day);
+  storeHighscores(highscores)
   endLoop = kontra.gameLoop({
     update: function(){
 
