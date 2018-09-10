@@ -1178,7 +1178,6 @@ function newGame(){
 
   canvas.addEventListener("mousedown", gameClick = function(event){
     if (event.which == 1){
-      console.log("Clicked (" + event.pageX + ", " + event.pageY + ")   (" + Math.round(event.pageX / drawingScale) + ", " + Math.round(event.pageY / drawingScale) + ")"); // Temporary code to help me debug and place elements. Really kick me if I leave this in! :-P
       if(event.pageX > defaultSidebar.width){ // If the event does not land on the sidebar.
         for(let i = 0; i < buildingsLength; i++){ // Try to find a building that was clicked on.
           if(event.pageX >= gameState.buildings[i].x && event.pageX <= gameState.buildings[i].x2 && event.pageY >= gameState.buildings[i].y && event.pageY <= gameState.buildings[i].y2){
