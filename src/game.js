@@ -1,3 +1,8 @@
+/*
+ *  Loadshedding
+ *  By Logan Neyt 2018
+ */
+
 kontra.init();  // Initilize the kontra library.
 
 let canvas = document.querySelector("canvas");  // Find the canvas that we will be using.
