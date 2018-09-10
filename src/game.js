@@ -339,6 +339,7 @@ function defSidebar(){
     context.fillStyle = this.color2;
     context.fillRect(drawingScale, drawingScale, this.width - (3 * drawingScale), 13 * drawingScale);
     context.fillRect(drawingScale, 15 * drawingScale, this.width - (3 * drawingScale), 31 * drawingScale);
+    context.fillRect(drawingScale, 47 * drawingScale, this.width - (3 * drawingScale), 38 * drawingScale);
     // Draw text.
     context.font = Math.round(6 * drawingScale) + this.font;
     context.fillStyle = this.textColor;
@@ -349,6 +350,13 @@ function defSidebar(){
     context.fillText("2hr - " + gameState.weatherAtTime(1500), 7 * drawingScale, 32 * drawingScale);
     context.fillText("5hr - " + gameState.weatherAtTime(3750), 7 * drawingScale, 38 * drawingScale);
     context.fillText("12hr - " + gameState.weatherAtTime(9000), 4 * drawingScale, 44 * drawingScale);
+    // Draw total's by building.
+    context.fillText("Building Contribution", 2 * drawingScale, 52 * drawingScale);
+    context.fillText("Houses           " + Math.floor(gameState.netPowerList[0]), 7 * drawingScale, 58 * drawingScale);
+    context.fillText("Offices           " + Math.floor(gameState.netPowerList[1]), 7 * drawingScale, 64 * drawingScale);
+    context.fillText("Factories        " + Math.floor(gameState.netPowerList[2]), 7 * drawingScale, 70 * drawingScale);
+    context.fillText("Wind Turbines  " + Math.floor(gameState.netPowerList[3]), 7 * drawingScale, 76 * drawingScale);
+    context.fillText("Solar Panels   " + Math.floor(gameState.netPowerList[4]), 7 * drawingScale, 82 * drawingScale);
     // Restore the coordinate system.
     context.restore();
   };
@@ -396,6 +404,7 @@ function game(){
   this.futureWeather = [[7, 2, "Windy, Clear", 1800]];  // Array to hold at least 12hrs worth of pre-generated weather. Required for the weather forecast.
   this.powerGenerated = 1; // How much power is being generated.
   this.powerConsumed = 0; // How much power is being consumed.
+  this.netPowerList = []; // How much each building type is contributing to the grid.
   this.gridFailTime = 360; // How many frames before the game is lost.
   this.gridFail = this.gridFailTime;  // Counts down to fail if the amount of power being consumend exceded the power being generated.
 
@@ -451,12 +460,14 @@ function game(){
     return duration;
   };
 
-  this.generate = function(power){ // Add to the powerGenerated tally.
-    this.powerGenerated = this.powerGenerated + power;
-  }
-  this.consume = function(power){  // Add to the powerConsumed tally.
-    this.powerConsumed = this.powerConsumed + power;
-  }
+  this.generate = function(power, type){ // Add to the powerGenerated tally.
+    this.powerGenerated += power;
+    this.netPowerList[type] += power;
+  };
+  this.consume = function(power, type){  // Add to the powerConsumed tally.
+    this.powerConsumed += power;
+    this.netPowerList[type] -= power;
+  };
 
   this.update = function (){  // Update the game's state.
     // Update the in game time and day.
@@ -497,6 +508,7 @@ function game(){
     // Clear the power variables for the next turn.
     this.powerGenerated = 1;
     this.powerConsumed = 0;
+    this.netPowerList = [0, 0, 0, 0, 0];
     // Update the weather.
     this.weatherDelay--;
     // Generate new weather.
@@ -599,7 +611,7 @@ function House(xPos, yPos){
     // Update the inertia & powered state.
     if(!(this.inertia === false)){
       if(this.inertia > 0){
-        this.inertia = this.inertia - 1.5;
+        this.inertia -= 1.5;
       }else{
         this.inertia = false;
         this.togglePwd();
@@ -618,9 +630,9 @@ function House(xPos, yPos){
     if(this.powered){
       this.consumption = 2; // Base consumption.
       if(this.lights[0]){ // If the light is on
-        this.consumption = this.consumption + 1;
+        this.consumption += 1;
       };
-      gameState.consume(this.consumption);  // Update the gameState's variables.
+      gameState.consume(this.consumption, 0);  // Update the gameState's variables.
     }else{
       this.consumption = 0;
     };
@@ -703,7 +715,7 @@ function Office(xPos, yPos){
     // Update the inertia & powered state.
     if(!(this.inertia === false)){
       if(this.inertia > 0){
-        this.inertia = this.inertia - 0.5;
+        this.inertia -= 0.5;
       }else{
         this.inertia = false;
         this.togglePwd();
@@ -726,10 +738,10 @@ function Office(xPos, yPos){
       this.consumption = 2; // Base consumption.
       for(var i = 0; i < lightsLength; i++){
         if(this.lights[i][0]){ // If the light is on
-          this.consumption = this.consumption + 0.5;
+          this.consumption += 0.5;
         };
       };
-      gameState.consume(this.consumption);  // Update the gameState's variables.
+      gameState.consume(this.consumption, 1);  // Update the gameState's variables.
     }else{
       this.consumption = 0;
     };
@@ -820,7 +832,7 @@ function Factory(xPos, yPos){
     // Update the inertia & powered state.
     if(!(this.inertia === false)){
       if(this.inertia > 0){
-        this.inertia = this.inertia - 0.25;
+        this.inertia -= 0.25;
       }else{
         this.inertia = false;
         this.togglePwd();
@@ -829,7 +841,7 @@ function Factory(xPos, yPos){
     // Calculate the consumption.
     if(this.powered){
       this.consumption = 30;
-      gameState.consume(this.consumption);  // Update the gameState's variables.
+      gameState.consume(this.consumption, 2);  // Update the gameState's variables.
     }else{
       this.consumption = 0;
     };
@@ -905,6 +917,7 @@ function WindTurbine(xPos, yPos){
   this.powered = true;  // If the building is active.
   this.inertia = false; // Amount of time the building will take to change state.
   this.generation = 0;  // Amount of power the building is generating.
+  this.consumption = 0; // Amount of power the building is consuming.
 
   this.rescale = function(){ // Recalculate coordinates when drawingScale changes.
     this.x = this.rawX * drawingScale;  // X coordinate of the sprite in pixels.
@@ -918,7 +931,7 @@ function WindTurbine(xPos, yPos){
     // Update the inertia & powered state.
     if(!(this.inertia === false)){
       if(this.inertia > 0){
-        this.inertia = this.inertia - 1.5;
+        this.inertia -= 1.5;
       }else{
         this.inertia = false;
         this.togglePwd();
@@ -926,7 +939,7 @@ function WindTurbine(xPos, yPos){
     };
     // Increment the animation.
     if(this.powered && gameState.wind > 0){  // If building is active and there is wind
-      this.frame = this.frame + gameState.wind;
+      this.frame += gameState.wind;
       if(this.frame >= 120){
         this.frame = 0;
       };
@@ -934,10 +947,14 @@ function WindTurbine(xPos, yPos){
     // Calculate generation.
     if(this.powered){
       this.generation = 1.5 * gameState.wind;
+      this.consumption = 1;
     } else {
       this.generation = 0;
-    }
-    gameState.generate(this.generation);  // Update the gameState's variables.
+      this.consumption = 0;
+    };
+    // Update the gameState's variables.
+    gameState.generate(this.generation, 3);
+    gameState.consume(this.consumption, 3);
   };
   this.render = function(){
     this.sprite(this.x, this.y, drawingScale);
@@ -981,7 +998,7 @@ function WindTurbine(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Wind Turbine", this.powered, this.generation, 0, this.inertia);
+    defaultSidebar.building("Wind Turbine", this.powered, this.generation, this.consumption, this.inertia);
     let sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
@@ -1009,6 +1026,7 @@ function SolarPanel(xPos, yPos){
   this.powered = true;  // If this building is active.
   this.inertia = false; // Amount of time the building will take to change state.
   this.generation = 0;  // Amount of power the building is generating.
+  this.consumption = 0; // Amount of power the building is consuming.
 
   this.rescale = function(){ // Recalculate coordinates when drawingScale changes.
     this.x = this.rawX * drawingScale;  // X coordinate of the sprite in pixels.
@@ -1022,7 +1040,7 @@ function SolarPanel(xPos, yPos){
     // Update the inertia & powered state.
     if(!(this.inertia === false)){
       if(this.inertia > 0){
-        this.inertia = this.inertia - 2;
+        this.inertia -= 2;
       }else{
         this.inertia = false;
         this.togglePwd();
@@ -1035,10 +1053,14 @@ function SolarPanel(xPos, yPos){
       }else{
         this.generation = gameState.sunlight / gameState.clouds;
       };
+      this.consumption = 1;
     }else{
       this.generation = 0;
+      this.consumption = 0;
     };
-    gameState.generate(this.generation);  // Update the gameState's variables.
+    // Update the gameState's variables.
+    gameState.generate(this.generation, 4);
+    gameState.consume(this.consumption, 4);
   };
   this.render = function(){
     this.sprite(this.x, this.y, drawingScale);
@@ -1072,7 +1094,7 @@ function SolarPanel(xPos, yPos){
     context.restore();
   };
   this.sidebar = function(){
-    defaultSidebar.building("Solar Panel", this.powered, this.generation, 0, this.inertia);
+    defaultSidebar.building("Solar Panel", this.powered, this.generation, this.consumption, this.inertia);
     let sidebarSprite = defaultSidebar.relScale(this.x, this.y, this.x2, this.y2);  // Get the coordinates and relative scale to draw the sprite at.
     this.sprite(sidebarSprite[0], sidebarSprite[1], sidebarSprite[2]);  // Draw the sprite on the sidebar.
   };
