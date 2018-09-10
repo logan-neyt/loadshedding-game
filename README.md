@@ -1,5 +1,5 @@
 # Loadshedding
-Keep the grid from going Offline.
+Keep the power grid from going offline by selectively disconnecting buildings.
 
 My entry for Js13KGames 2018.
 
